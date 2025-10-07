@@ -5,7 +5,7 @@ function Split(inputstr, sep)
 	end
 	local t = {}
 	for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
-		table.insert(t, str)
+		table.insert(t, tonumber(str))
 	end
 	return t
 end
@@ -22,7 +22,7 @@ function Save()
 	local f=fopen("test.txt")
 	for k, l in pairs(lines) do
 		local sline = FillString(l).."\n"
-		line(l[1],l[2],l[3],l[4],2)
+--		line(l[1],l[2],l[3],l[4],2)
 		fputs(sline, f)
 	end
 	fclose(f)
@@ -33,13 +33,14 @@ local function IsEmpty(s)
 end
 
 function Load()
+	local lines={}
 	local f=fopen("test.txt", "r")
-	if f==0 then return end
+	if f==0 then return lines end
 
 	bContinue=true
-	while(bContinue)
-	do
-	 local s=fgets(f)
+	while(bContinue) do
+		local s=fgets(f)
+		trace(s)
 		if IsEmpty(s) then
 			bContinue=false
 		else
@@ -48,4 +49,5 @@ function Load()
 		end
 	end
 	fclose(f)
+	return lines
 end

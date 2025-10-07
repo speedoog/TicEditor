@@ -9,10 +9,13 @@
 -- bresenham 	https://zingl.github.io/bresenham.html
 
 btrace=false
-x1=0
-y1=0
+xStart=0
+yStart=0
+
+abs=math.abs
 
 lines={}
+lines2 = { }
 
 poke(0x3FFB,1)	-- hide cursor
 
@@ -24,32 +27,55 @@ dofile("Helpers.lua")
 
 ---------------------------------------------------
 
-Load()
+lines = Load()
+
+for k, l in pairs(lines) do
+	local ln = CreateLine(l[1],l[2],l[3],l[4],2)
+	table.insert(lines2, ln)
+end
+
+iLine=1
 
 t=0
+
+cls()
+
 function TIC()
-	cls()
 
 	local mx,my,ml,mm,mr=mouse()
 	
 	if ml then
 		if btrace==false then
-			x1=mx y1=my
+			xStart=mx
+			yStart=my
 			btrace = true
 		end
-		line(x1,y1,mx,my,2)
+		PlotLine(xStart,yStart,mx,my,2)
 	elseif btrace then
-		local ln = {x1,y1,mx,my}
+		local ln = {xStart,yStart,mx,my}
 		table.insert(lines, ln)
 		btrace = false
 		Save()
 	end
    
-	for k, l in pairs(lines) do
-		line(l[1],l[2],l[3],l[4],2)
+--	for k, l in pairs(lines) do
+--		PlotLine(l[1],l[2],l[3],l[4],2)
+--	end
+
+	-- if t>=(#lines) then t=1 trace(t) end
+	-- local l2=lines[math.ceil(t)]
+	-- if l2~=nil then
+	-- 	PlotLine(l2[1],l2[2],l2[3],l2[4],2)	
+	-- end
+
+	if iLine>=#lines2 then iLine=1 end
+	local curline = lines2[iLine]
+	if curline~=nil then
+		local b=curline:Draw()
+		if b then iLine=iLine+1 end
 	end
-	
-	t=t+1
+
+	t=t+0.1
 	
 	if mr then
 		FloodFill(mx,my,3)
