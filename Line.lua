@@ -1,4 +1,12 @@
 
+function PixPatch(x,y,c)
+	pix(x,y, c+1)
+	pix(x-1,y+1, c)
+	pix(x+1,y-1, c)
+	pix(x-1,y+1, c)
+	pix(x+1,y+1, c)
+end
+
 function PlotLine(x0,y0,x1,y1,c)
 	local dx = abs(x1-x0)
 	local dy =-abs(y1-y0)
@@ -12,9 +20,7 @@ function PlotLine(x0,y0,x1,y1,c)
 	local b=true
 	while(b) do
 		pix(x0,y0, c)
-
 		e2 = 2*err
-
 		if e2>=dy then -- e_xy+e_x > 0
 			if x0==x1 then b=false end
 			err=err+dy
@@ -30,6 +36,7 @@ function PlotLine(x0,y0,x1,y1,c)
 	end
 end
 
+
 function CreateLine(x0,y0,x1,y1,c)
 	local line = { }
 	line.x = x0
@@ -37,7 +44,6 @@ function CreateLine(x0,y0,x1,y1,c)
 	line.dx = abs(x1-x0)
 	line.dy =-abs(y1-y0)
 
---	local sx,sy
 	if x0<x1 then line.sx=1 else line.sx=-1 end
 	if y0<y1 then line.sy=1 else line.sy=-1 end
 
@@ -47,6 +53,7 @@ function CreateLine(x0,y0,x1,y1,c)
 	function line:Draw()
 		local stop=false
 		pix(self.x,self.y, c)
+
 		if self.x==x1 and self.y==y1 then stop=true end
 
 		self.e2 = 2*self.err

@@ -9,7 +9,7 @@ function FloodFill(x, y, c)
 	q:push({x, y})
 	while q:isEmpty() == false do
 		loops = loops + 1
-		if loops / 2 > t % 200 then return end
+		if loops / 2 > t then return end
 
 		local v = q:pop()
 		x = v[1]

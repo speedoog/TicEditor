@@ -8,6 +8,9 @@
 -- palette 		https://www.pixilart.com/palettes/tic-80-20367
 -- bresenham 	https://zingl.github.io/bresenham.html
 
+-- CRT F6
+-- Rec F9
+
 btrace=false
 xStart=0
 yStart=0
@@ -30,7 +33,7 @@ dofile("Helpers.lua")
 lines = Load()
 
 for k, l in pairs(lines) do
-	local ln = CreateLine(l[1],l[2],l[3],l[4],2)
+	local ln = CreateLine(l[1],l[2],l[3],l[4],10)
 	table.insert(lines2, ln)
 end
 
@@ -38,8 +41,8 @@ iLine=1
 
 t=0
 
-cls()
 
+cls()
 function TIC()
 
 	local mx,my,ml,mm,mr=mouse()
@@ -58,9 +61,9 @@ function TIC()
 		Save()
 	end
    
---	for k, l in pairs(lines) do
---		PlotLine(l[1],l[2],l[3],l[4],2)
---	end
+	-- for k, l in pairs(lines) do
+	-- 	PlotLine(l[1],l[2],l[3],l[4],2)
+	-- end
 
 	-- if t>=(#lines) then t=1 trace(t) end
 	-- local l2=lines[math.ceil(t)]
@@ -68,20 +71,32 @@ function TIC()
 	-- 	PlotLine(l2[1],l2[2],l2[3],l2[4],2)	
 	-- end
 
-	if iLine>=#lines2 then iLine=1 end
+--	if iLine>=#lines2 then iLine=1 end
 	local curline = lines2[iLine]
 	if curline~=nil then
 		local b=curline:Draw()
 		if b then iLine=iLine+1 end
+	else
+		if bFill then 
+			cls()
+			for k, l in pairs(lines) do
+				PlotLine(l[1],l[2],l[3],l[4],10)
+			end			
+			FloodFill(120,100,8)
+		else
+			bFill = true
+			t=0
+		end
 	end
 
-	t=t+0.1
 	
-	if mr then
-		FloodFill(mx,my,3)
-	end
-   
-	Cursor(mx,my)
+	-- if mr then
+	-- 	t=0
+	-- 	FloodFill(mx,my,14)
+	-- end
+	t=t+1
+	
+--	Cursor(mx,my)
 end
 
 
