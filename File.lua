@@ -40,7 +40,7 @@ function Load()
 	bContinue=true
 	while(bContinue) do
 		local s=fgets(f)
-		trace(s)
+--		trace(s)
 		if IsEmpty(s) then
 			bContinue=false
 		else

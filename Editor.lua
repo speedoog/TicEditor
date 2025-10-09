@@ -74,8 +74,11 @@ function TIC()
 --	if iLine>=#lines2 then iLine=1 end
 	local curline = lines2[iLine]
 	if curline~=nil then
-		local b=curline:Draw()
-		if b then iLine=iLine+1 end
+		local b
+		for i=0,10 do
+			b=curline:Draw()
+			if b then iLine=iLine+1 break end
+		end
 	else
 		if bFill then 
 			cls()
@@ -89,12 +92,13 @@ function TIC()
 		end
 	end
 
+	ditherrect(0,t%300-150,30,136,136,2,3)
 	
 	-- if mr then
 	-- 	t=0
 	-- 	FloodFill(mx,my,14)
 	-- end
-	t=t+1
+	t=t+2
 	
 --	Cursor(mx,my)
 end
