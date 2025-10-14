@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run TIC80",
+			"type": "shell",
+			"command": "${fileWorkspaceFolder}/tic80.exe --skip --fs . --cmd \"load Editor.lua\"",
+			"options": {
+				"cwd": "${workspaceFolder}/"
+			},
+			"problemMatcher": []
+		}
+	]
+}
