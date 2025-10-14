@@ -39,22 +39,24 @@ end
 
 function CreateLine(x0,y0,x1,y1,c)
 	local line = { }
-	line.x = x0
-	line.y = y0
-	line.dx = abs(x1-x0)
-	line.dy =-abs(y1-y0)
 
-	if x0<x1 then line.sx=1 else line.sx=-1 end
-	if y0<y1 then line.sy=1 else line.sy=-1 end
+	function line:Init()
+		self.x = x0
+		self.y = y0
+		self.dx = abs(x1-x0)
+		self.dy =-abs(y1-y0)
 
-	line.err=line.dx+line.dy -- error value e_xy
-	line.e2 = line.err
+		if x0<x1 then line.sx=1 else line.sx=-1 end
+		if y0<y1 then line.sy=1 else line.sy=-1 end
 
-	function line:Draw()
-		local stop=false
-		pix(self.x,self.y, c)
+		self.err= self.dx+self.dy -- error value e_xy
+		self.e2 = self.err
+	end
 
-		if self.x==x1 and self.y==y1 then stop=true end
+	function line:Draw(fnPix)
+		fnPix(self.x,self.y, c)
+
+		if self.x==x1 and self.y==y1 then return false end
 
 		self.e2 = 2*self.err
 
@@ -68,7 +70,7 @@ function CreateLine(x0,y0,x1,y1,c)
 			self.y =self.y+self.sy
 		end
 
-		return stop
+		return true
 	end
 
 	return line
