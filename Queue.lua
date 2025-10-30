@@ -36,5 +36,3 @@ function CreateQueue()
 
 	return queue
 end
-
-trace("Queue.lua loaded")

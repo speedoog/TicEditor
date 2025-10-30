@@ -24,11 +24,17 @@ lines2 = { }
 
 --poke(0x3FFB,1)	-- hide cursor
 
-dofile("Queue.lua")
-dofile("File.lua")
-dofile("Line.lua")
-dofile("Fill.lua")
-dofile("Helpers.lua")
+function include(file)
+	trace(file.." load")
+	dofile(file)
+	trace(file.." loaded !")
+end
+
+include("Queue.lua")
+include("File.lua")
+include("Line.lua")
+include("Fill.lua")
+include("Helpers.lua")
 
 ---------------------------------------------------
 
@@ -39,8 +45,7 @@ for k, l in pairs(lines) do
 	ln:Init()
 	function f() end
 	iPix=0
-	while ln:Draw(f) do
-		iPix=iPix+1
+	while ln:Draw(function(x,y,c) iPix=iPix+1 end) do
 	end
 --	trace(iPix)
 --	ln:Init()
@@ -74,20 +79,11 @@ function DrawPalette()
 end
 
 function DrawMenu()
-	rect(0,0,gSizeX,8,12)
+	rect(0,0,gSizeX,7,12)
 	print("Editor",1,1,15)
 end
 
 function DrawSequencer()
-	-- rseed(0)
-	-- local ax=0
-	-- local c=13
-	-- while ax<gSizeX do
-	-- 	local sx=rand()*20+5
-	-- 	if c==13 then c=15 else c=13 end
-	-- 	rect(ax,gSizeY-gSeqSize,ax+sx,gSeqSize,c)
-	-- 	ax=ax+sx
-	-- end
 	local c=13
 	ax=0
 	for k, ln in pairs(lines2) do
@@ -96,7 +92,6 @@ function DrawSequencer()
 		if c==13 then c=15 else c=13 end
 	 	ax=ax+sx
 	end
-
 end
 
 function DrawUI()
@@ -143,13 +138,10 @@ function TIC()
 	local bContinue
 --	trace("-------------")
 	for k, ln in pairs(lines2) do
---		trace("k"..tostring(k))
 		bContinue=true
 		ln:Init()
 		while bContinue do
-			bContinue = ln:Draw(pix)
-			iPix=iPix+1
---			trace("iPix"..tostring(iPix))
+			bContinue = ln:Draw(function(x,y,c) pix(x,y,c) iPix=iPix+1 end)
 			if iPix>=gPixTarget then bComplete=true bContinue=false end
 		end
 		if bComplete then break end
@@ -202,6 +194,7 @@ end
 
 
 -- <TILES>
+-- 000:0123456700000000000000000000000000000000000000000000000000000000
 -- 001:eccccccccc888888caaaaaaaca888888cacccccccacc0ccccacc0ccccacc0ccc
 -- 002:ccccceee8888cceeaaaa0cee888a0ceeccca0ccc0cca0c0c0cca0c0c0cca0c0c
 -- 003:eccccccccc888888caaaaaaaca888888cacccccccacccccccacc0ccccacc0ccc
@@ -211,6 +204,15 @@ end
 -- 019:cacccccccaaaaaaacaaacaaacaaaaccccaaaaaaac8888888cc000cccecccccec
 -- 020:ccca00ccaaaa0ccecaaa0ceeaaaa0ceeaaaa0cee8888ccee000cceeecccceeee
 -- </TILES>
+
+-- <SPRITES>
+-- 000:89abcdef00000000000000000000000000000000000000000000000000000000
+-- </SPRITES>
+
+-- <MAP>
+-- 001:102000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+-- 002:112100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+-- </MAP>
 
 -- <WAVES>
 -- 000:00000000ffffffff00000000ffffffff
