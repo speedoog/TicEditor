@@ -5,7 +5,12 @@ function Split(inputstr, sep)
 	end
 	local t = {}
 	for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
-		table.insert(t, tonumber(str))
+		local n=tonumber(str)
+		if n==nil then 
+			table.insert(t, str)
+		else
+			table.insert(t, tonumber(str))
+		end
 	end
 	return t
 end
@@ -28,26 +33,47 @@ function Save()
 	fclose(f)
 end
 
-local function IsEmpty(s)
+function IsEmpty(s)
 	return s == nil or s == ''
 end
 
-function Load()
-	local lines={}
-	local f=fopen("test.txt", "r")
-	if f==0 then return lines end
+function CreateItem(l)
+	local p=Split(l)
+	local item
+	if (p[1]=="line") then item=CreateLine(p[2],p[3],p[4],p[5],p[6]) end
 
-	bContinue=true
-	while(bContinue) do
-		local s=fgets(f)
---		trace(s)
-		if IsEmpty(s) then
-			bContinue=false
-		else
-			l=Split(s)
-			table.insert(lines, l)
-		end
+	if item~=nil then
+		item:Init()
+		item.npix=0
+		while item:Draw(function(x,y,c) item.npix=item.npix+1 end) do end
 	end
-	fclose(f)
-	return lines
+	return item
+end
+
+
+function Load()
+	local out={}
+	out.npix=0
+	out.items={}
+	local TotalPix=0
+	local f=fopen("test.txt", "r")
+	if f~=0 then
+		while(true) do
+			local s=fgets(f)
+			if IsEmpty(s) then
+				break
+			else
+				local item =CreateItem(s)
+				if item~=nil then
+					out.npix=out.npix+item.npix
+					table.insert(out.items, item)
+				end
+			end
+		end
+		fclose(f)
+	end
+--	out.TotalPix = TotalPix
+--	trace("total "..TotalPix)
+--	trace(dump(out))
+	return out
 end

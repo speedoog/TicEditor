@@ -38,6 +38,8 @@ end
 
 
 function CreateLine(x0,y0,x1,y1,c)
+	if c==nil then c=10 end
+
 	local line = { }
 
 	function line:Init()

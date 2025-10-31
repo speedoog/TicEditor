@@ -15,11 +15,7 @@ btrace=false
 xStart=0
 yStart=0
 
-abs=math.abs
-rseed=math.randomseed
-rand=math.random
 
-lines={}
 lines2 = { }
 
 --poke(0x3FFB,1)	-- hide cursor
@@ -30,31 +26,19 @@ function include(file)
 	trace(file.." loaded !")
 end
 
+include("Maths.lua")
 include("Queue.lua")
 include("File.lua")
 include("Line.lua")
 include("Fill.lua")
 include("Helpers.lua")
 
+
 ---------------------------------------------------
 
-lines = Load()
-gTotalPix=0
-for k, l in pairs(lines) do
-	local ln = CreateLine(l[1],l[2],l[3],l[4],10)
-	ln:Init()
-	function f() end
-	iPix=0
-	while ln:Draw(function(x,y,c) iPix=iPix+1 end) do
-	end
---	trace(iPix)
---	ln:Init()
-	ln.npix=iPix
-	gTotalPix=gTotalPix+iPix
-	table.insert(lines2, ln)
-end
+lines2 = Load()
 
-iLine=1
+--iLine=1
 
 t=0
 
@@ -86,8 +70,9 @@ end
 function DrawSequencer()
 	local c=13
 	ax=0
-	for k, ln in pairs(lines2) do
-		sx=(ln.npix/gTotalPix)*gSizeX
+	for k, ln in pairs(lines2.items) do
+--		trace(dump(ln))
+		sx=(ln.npix/lines2.npix)*gSizeX
 		rect(ax,gSizeY-gSeqSize,ax+sx,gSeqSize,c)
 		if c==13 then c=15 else c=13 end
 	 	ax=ax+sx
@@ -114,7 +99,7 @@ function TIC()
 	
 	if ml then
 		if my>(gSizeY-gSeqSize) then
-			gPixTarget =(mx/gSizeX)*gTotalPix
+			gPixTarget =(mx/gSizeX)*lines2.npix
 		else
 			if btrace==false then
 				xStart=mx
@@ -137,7 +122,7 @@ function TIC()
 	local bComplete=false
 	local bContinue
 --	trace("-------------")
-	for k, ln in pairs(lines2) do
+	for k, ln in pairs(lines2.items) do
 		bContinue=true
 		ln:Init()
 		while bContinue do
