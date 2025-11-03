@@ -15,6 +15,7 @@ btrace=false
 xStart=0
 yStart=0
 
+-- test commit
 
 lines2 = { }
 
