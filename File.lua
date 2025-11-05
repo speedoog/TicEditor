@@ -41,6 +41,7 @@ function CreateItem(l)
 	local p=Split(l)
 	local item
 	if (p[1]=="line") then item=CreateLine(p[2],p[3],p[4],p[5],p[6]) end
+	if (p[1]=="circle") then item=CreateCircle(p[2],p[3],p[4],p[5]) end
 
 	if item~=nil then
 		item:Init()

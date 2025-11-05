@@ -31,6 +31,7 @@ include("Maths.lua")
 include("Queue.lua")
 include("File.lua")
 include("Line.lua")
+include("Circle.lua")
 include("Fill.lua")
 include("Helpers.lua")
 
@@ -97,6 +98,8 @@ function TIC()
 	cls()
 
 	local mx,my,ml,mm,mr=mouse()
+
+--	bresenham(mx, my, 30, 5)
 	
 	if ml then
 		if my>(gSizeY-gSeqSize) then
