@@ -24,6 +24,7 @@ require "Maths"
 require "Queue"
 require "File"
 require "Line"
+require "Circle"
 require "Fill"
 require "Helpers"
 
@@ -84,6 +85,8 @@ function TIC()
 	cls()
 
 	local mx,my,ml,mm,mr=mouse()
+
+--	bresenham(mx, my, 30, 5)
 	
 	if ml then
 		if my>(gSizeY-gSeqSize) then
