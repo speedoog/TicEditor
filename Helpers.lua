@@ -1,3 +1,7 @@
+gSizeX	=240
+gSizeY	=136
+gWhite	=12
+
 function Cursor(mx, my)
 	local max = 2
 	local min = 1

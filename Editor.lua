@@ -19,33 +19,20 @@ yStart=0
 
 lines2 = { }
 
---poke(0x3FFB,1)	-- hide cursor
 
-function include(file)
-	trace(file.." load")
-	dofile(file)
-	trace(file.." loaded !")
-end
+require "Maths"
+require "Queue"
+require "File"
+require "Line"
+require "Fill"
+require "Helpers"
 
-include("Maths.lua")
-include("Queue.lua")
-include("File.lua")
-include("Line.lua")
-include("Fill.lua")
-include("Helpers.lua")
-
+UI = require "UI"
 
 ---------------------------------------------------
 
 lines2 = Load()
 
---iLine=1
-
-t=0
-
-gSizeX	=240
-gSizeY	=136
-gWhite	=12
 gSeqSize=12
 
 function DrawPalette()
@@ -173,7 +160,6 @@ function TIC()
 	-- 	t=0
 	-- 	FloodFill(mx,my,14)
 	-- end
-	t=t+2
 	
 --	Cursor(mx,my)
 end
