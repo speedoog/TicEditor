@@ -51,11 +51,25 @@ function CreateItem(l)
 	return item
 end
 
+function AppendItem(scene, item)
+	if item~=nil then
+		item:Init()
+
+		item.npix=0
+		while item:Draw(function(x,y,c) item.npix=item.npix+1 end) do end
+		trace("ooooooooooooooooooooooooooooooooooo")
+		trace(item.npix)
+		trace(scene.npix)
+		trace("ooooooooooooooooooooooooooooooooooo")
+		scene.npix=scene.npix+item.npix
+		table.insert(scene.items, item)
+	end
+end
 
 function Load()
-	local out={}
-	out.npix=0
-	out.items={}
+	local scene={}
+	scene.npix=0
+	scene.items={}
 	local TotalPix=0
 	local f=fopen("test.txt", "r")
 	if f~=0 then
@@ -65,16 +79,13 @@ function Load()
 				break
 			else
 				local item =CreateItem(s)
-				if item~=nil then
-					out.npix=out.npix+item.npix
-					table.insert(out.items, item)
-				end
+				AppendItem(scene, item)
 			end
 		end
 		fclose(f)
 	end
---	out.TotalPix = TotalPix
+--	scene.TotalPix = TotalPix
 --	trace("total "..TotalPix)
---	trace(dump(out))
-	return out
+--	trace(dump(scene))
+	return scene
 end

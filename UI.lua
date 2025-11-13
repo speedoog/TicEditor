@@ -1,6 +1,8 @@
 local UI = { show=true, color1=2, color2=4, tooltips={}, tool="line", _x=0, _y=0,_sz=8 }
 gSeqSize=12
 gPixTarget =0
+scene = {npix=0}
+
 
 function UI:DrawTooltips()
 	for k, tip in pairs(self.tooltips) do
@@ -47,10 +49,12 @@ end
 function UI:ButtonTool(id,text)
 	local cbk=15
 	if text==self.tool then cbk=2 end
-	if self:ButtonIcon(self._x,self._y,self._sz,self._sz,cbk,id,text) then
+	local b = self:ButtonIcon(self._x,self._y,self._sz,self._sz,cbk,id,text)
+	if b then
 		self.tool=text
 	end
 	self._y=self._y+self._sz
+	return b
 end
 
 function UI:DrawPalette()
@@ -79,7 +83,9 @@ function UI:DrawTools()
 	self:ButtonTool(257,"circle")
 	self:ButtonTool(258,"fill")
 	self:ButtonTool(259,"wait")
-	self:ButtonTool(260,"trash")
+	if self:ButtonTool(260,"trash") then
+		table.remove(scene.items, #scene.items)
+	end
 end
 
 function UI:DrawMenu()
@@ -141,6 +147,17 @@ function UI:UpdateEditLine()
 			end
 		end
 	elseif btrace then
+		local item=nil
+		if self.tool=="line" then
+			item = CreateLine(xStart,yStart,mx,my,self.color1)
+		elseif self.tool=="circle" then
+			local dx=mx-xStart
+			local dy=my-yStart
+			local r=floor(sqrt(dx*dx+dy*dy))
+			item=CreateCircle(xStart,yStart,r,self.color1)
+		end
+		AppendItem(scene,item)
+
 		btrace = false
 	end
 end
@@ -167,8 +184,8 @@ function UI:Init()
     btrace = false
 
     scene = Load()
-    Save()
-    UI:Draw()
+
+	UI:Draw()
 end
 
 function UI:Update()
