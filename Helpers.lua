@@ -2,7 +2,6 @@ gSizeX	=240
 gSizeY	=136
 gWhite	=12
 
-
 function dump(o)
    if type(o) == 'table' then
       local s = '{ '
@@ -16,17 +15,23 @@ function dump(o)
    end
 end
 
-function overlap(x,y,x0,x1,y0,y1)
-   if x<x0 or x>x1 or y<y0 or y>y1 then return false end
-   return true
+function HideCursor()
+    poke(0x3FFB,1)
 end
 
-function Button(x,y,w,h,c)
-   rect(x,y,w,h,c)
-   rectb(x,y,w,h,15)
-  	local mx,my,ml,mm,mr=mouse()
-   if (ml or mr) and overlap(mx,my,x,x+w,y,y+h) then
-      return ml,mr
-   end
-   return false,false
+function DrawCrosshair(mx, my)
+	local max = 2
+	local min = 1
+	local color = 15
+	PlotLine(mx-max, my, mx-min, my, color)
+	PlotLine(mx+min, my, mx+max, my, color)
+	PlotLine(mx, my-max, mx, my-min, color)
+	PlotLine(mx, my+min, mx, my+max, color)
 end
+
+
+function CirclePal(x,y,r,c)
+	circ(x, y, r, c)
+	circb(x, y, r, 15)
+end
+

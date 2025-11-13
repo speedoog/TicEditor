@@ -1,4 +1,4 @@
-abs,sin,cos,tan,pi,min,max,floor=math.abs,math.sin,math.cos,math.tan,math.pi,math.min,math.max,math.floor
+sqrt,abs,sin,cos,tan,pi,min,max,floor=math.sqrt,math.abs,math.sin,math.cos,math.tan,math.pi,math.min,math.max,math.floor
 rand,seed=math.random,math.randomseed
 
 function remap( x, t1, t2, s1, s2 )
@@ -21,4 +21,9 @@ function cuberp(a,b,c,d,t)
 	local D=b
 	local T=t*t
 	return A*t*T+B*T+C*t+D
+end
+
+function overlap(x,y,x0,x1,y0,y1)
+   if x<x0 or x>x1 or y<y0 or y>y1 then return false end
+   return true
 end

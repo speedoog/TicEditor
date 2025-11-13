@@ -1,27 +1,57 @@
-local UI = { show=true, color1=2, color2=4 }
-
-function UI:HideCursor()
-    poke(0x3FFB,1)
-end
-
-function UI:DrawCrosshair(mx, my)
-	local max = 2
-	local min = 1
-	local color = 15
-	PlotLine(mx-max, my, mx-min, my, color)
-	PlotLine(mx+min, my, mx+max, my, color)
-	PlotLine(mx, my-max, mx, my-min, color)
-	PlotLine(mx, my+min, mx, my+max, color)
-end
-
+local UI = { show=true, color1=2, color2=4, tooltips={}, tool="line", _x=0, _y=0,_sz=8 }
 gSeqSize=12
 gPixTarget =0
 
-function CirclePal(x,y,r,c)
-	circ(x, y, r, c)
-	circb(x, y, r, 15)
+function UI:DrawTooltips()
+	for k, tip in pairs(self.tooltips) do
+	   	print(tip.t,tip.x,tip.y,tip.c,false,1,true)
+	end
+	self.tooltips = {}
 end
 
+function UI:tooltip(text)
+  	local mx,my=mouse()
+	local offx=3
+	local offy=-8
+
+	w=print(text,gSizeX,gSizeY,0,false,1,true)
+
+	if mx>200 then offx=-w end
+	table.insert(self.tooltips, {x=mx+offx,y=my+offy,c=12,t=text})
+end
+
+function UI:Button(x,y,w,h,c,text)
+   	rect(x,y,w,h,c)
+   	rectb(x,y,w,h,15)
+	local mx,my,ml,mm,mr=mouse()
+   	local hover =overlap(mx,my,x+1,x+w-1,y+1,y+h-1)
+	if hover then
+		self:tooltip(text)
+		return ml,mr 
+	end
+	return false,false
+end
+
+function UI:ButtonIcon(x,y,w,h,cbk,id,text)
+   	rect(x,y,w,h,cbk)
+   	spr(id,x+w/2-4,y+h/2-4,0)
+  	local mx,my,ml,mm,mr=mouse()
+   	local hover =overlap(mx,my,x+1,x+w-1,y+1,y+h-1)
+	if hover then
+		self:tooltip(text)
+		return ml,mr 
+	end
+	return false,false
+end
+
+function UI:ButtonTool(id,text)
+	local cbk=15
+	if text==self.tool then cbk=2 end
+	if self:ButtonIcon(self._x,self._y,self._sz,self._sz,cbk,id,text) then
+		self.tool=text
+	end
+	self._y=self._y+self._sz
+end
 
 function UI:DrawPalette()
 	local ox=0
@@ -30,15 +60,26 @@ function UI:DrawPalette()
 	local bsize	=8
 	local columns=2
 	local colorspercol = math.floor(colors/columns)
-	for i=0,colors-1 do
-		local iy = i%colorspercol
-		local ix = i//colorspercol
-		local ml, mr = Button(ox+ix*bsize,oy+iy*bsize,bsize+1,bsize+1,i)
-		if ml then self.color1=i end
-		if mr then self.color2=i end
+	for c=0,colors-1 do
+		local iy = c%colorspercol
+		local ix = c//colorspercol
+		local ml, mr = self:Button(ox+ix*bsize,oy+iy*bsize,bsize+1,bsize+1,c,tostring(c))
+		if ml then self.color1=c end
+		if mr then self.color2=c end
 	end
 	CirclePal(ox+bsize*0.5, oy-bsize*0.6, bsize/2, self.color1)
 	CirclePal(ox+bsize*1.5, oy-bsize*0.6, bsize/2, self.color2)	
+end
+
+function UI:DrawTools()
+	self._sz=12
+	self._x=gSizeX-self._sz
+	self._y=40
+	self:ButtonTool(256,"line")
+	self:ButtonTool(257,"circle")
+	self:ButtonTool(258,"fill")
+	self:ButtonTool(259,"wait")
+	self:ButtonTool(260,"trash")
 end
 
 function UI:DrawMenu()
@@ -68,9 +109,11 @@ function UI:Draw()
 
 	if self.show then		
 		self:DrawPalette()
+		self:DrawTools()
 		self:DrawMenu()
 		self:DrawSequencer()
 	end
+	self:DrawTooltips()
 
 	vbank(0)
 end
@@ -87,7 +130,14 @@ function UI:UpdateEditLine()
 				yStart=my
 				btrace = true
 			else
-				PlotLine(xStart,yStart,mx,my,2)
+				if self.tool=="line" then
+					PlotLine(xStart,yStart,mx,my,self.color1)
+				elseif self.tool=="circle" then
+					local dx=mx-xStart
+					local dy=my-yStart
+					local r=floor(sqrt(dx*dx+dy*dy))
+					PlotCircle(xStart,yStart,r,self.color1)
+				end
 			end
 		end
 	elseif btrace then
