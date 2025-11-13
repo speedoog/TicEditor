@@ -5,11 +5,11 @@ function Split(inputstr, sep)
 	end
 	local t = {}
 	for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
-		local n=tonumber(str)
-		if n==nil then 
+		local num=tonumber(str)
+		if num==nil then 
 			table.insert(t, str)
 		else
-			table.insert(t, tonumber(str))
+			table.insert(t, num)
 		end
 	end
 	return t
@@ -22,12 +22,12 @@ function FillString(array)
 	end
 	return s
 end
-  
-function Save()
-	local f=fopen("test.txt")
-	for k, l in pairs(lines) do
-		local sline = FillString(l).."\n"
---		line(l[1],l[2],l[3],l[4],2)
+
+function Save(file)
+	if file==nil then file="temp.txt" end
+	local f=fopen(file)
+	for k, item in pairs(scene.items) do
+		local sline = item:str().."\n"
 		fputs(sline, f)
 	end
 	fclose(f)

@@ -30,6 +30,11 @@ function CreateCircle(x, y, r, c)
 
 	local circle = {}
 
+	function circle:str()
+		s="circle "..tostring(x).." "..tostring(y).." "..tostring(r).." "..tostring(c)
+		return s
+	end
+
 	function circle:Init()
 		s = self
 		s.x = x

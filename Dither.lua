@@ -40,6 +40,9 @@ BayerMatrix16 =
 {63, 191, 31, 159, 55, 183, 23, 151, 61, 189, 29, 157, 53, 181, 21, 149},
 {255, 127, 223, 95, 247, 119, 215, 87, 253, 125, 221, 93, 245, 117, 213, 85}}
 
+-- sample
+--	ditherrect(0,0,30,136,136,2,3)
+
 function ditherrect(x,y,w,h,fadeThickness,c1,c2)
 	local horizontal = false
 	local matrixSize = 8
