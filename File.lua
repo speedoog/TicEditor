@@ -57,10 +57,7 @@ function AppendItem(scene, item)
 
 		item.npix=0
 		while item:Draw(function(x,y,c) item.npix=item.npix+1 end) do end
-		trace("ooooooooooooooooooooooooooooooooooo")
-		trace(item.npix)
-		trace(scene.npix)
-		trace("ooooooooooooooooooooooooooooooooooo")
+
 		scene.npix=scene.npix+item.npix
 		table.insert(scene.items, item)
 	end

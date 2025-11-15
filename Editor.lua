@@ -11,6 +11,12 @@
 -- CRT F6
 -- Rec F9
 
+--require("lldebugger").start()
+
+if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
+	trace("Debugger ok")
+  	require("lldebugger").start()
+end
 
 require "Maths"
 require "Helpers"
