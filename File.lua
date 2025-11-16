@@ -40,26 +40,37 @@ end
 function CreateItem(l)
 	local p=Split(l)
 	local item
-	if (p[1]=="line") then item=CreateLine(p[2],p[3],p[4],p[5],p[6]) end
-	if (p[1]=="circle") then item=CreateCircle(p[2],p[3],p[4],p[5]) end
-
-	if item~=nil then
-		item:Init()
-		item.npix=0
-		while item:Draw(function(x,y,c) item.npix=item.npix+1 end) do end
+	if p[1]=="line" then
+		item=CreateLine(p[2],p[3],p[4],p[5],p[6])
+	elseif p[1]=="circle" then
+		item=CreateCircle(p[2],p[3],p[4],p[5])
+	elseif p[1]=="fill" then
+		item=CreateFill(p[2],p[3],p[4])
 	end
+
 	return item
 end
 
 function AppendItem(scene, item)
 	if item~=nil then
-		item:Init()
-
-		item.npix=0
-		while item:Draw(function(x,y,c) item.npix=item.npix+1 end) do end
-
-		scene.npix=scene.npix+item.npix
 		table.insert(scene.items, item)
+	end
+end
+
+function ComputeTotalPix(scene)
+	scene.npix=0
+
+	cls()
+	local bContinue
+	for k, item in pairs(scene.items) do
+		item:Init()
+		item.npix=0
+		bContinue=true
+		while bContinue do
+			item.npix=item.npix+1
+			bContinue = item:Draw(function(x,y,c) pix(x,y,c) end)
+		end
+		scene.npix=scene.npix+item.npix
 	end
 end
 
@@ -81,8 +92,6 @@ function Load()
 		end
 		fclose(f)
 	end
---	scene.TotalPix = TotalPix
---	trace("total "..TotalPix)
---	trace(dump(scene))
+	ComputeTotalPix(scene)
 	return scene
 end

@@ -64,3 +64,58 @@ function scan(q, lx, rx, y, o)
 		end
 	end
 end
+
+
+
+function CreateFill(x,y,c)
+	if c==nil then c=10 end
+
+	local fill = { }
+
+	function fill:str()
+		return "fill "..tostring(x).." "..tostring(y).." "..tostring(c)
+	end
+
+	function fill:Init()
+		if not InScreen(x, y) then return end
+
+		self.x = x
+		self.y = y
+
+		self.o = pix(x, y)
+		self.q = CreateQueue()
+		self.q:push({x, y})
+	end
+
+	-- return "continue"
+	function fill:Draw(fnPix)
+		local q=self.q
+
+		if q:isEmpty() then
+			return false
+		end
+
+		local o=self.o
+		local v = q:pop()
+		local x = v[1]
+		local y = v[2]
+		local lx = x
+
+		while Inside(lx - 1, y, o) do
+			fnPix(lx - 1, y, c)
+			lx = lx - 1
+		end
+
+		while Inside(x, y, o) do
+			fnPix(x, y, c)
+			x = x + 1
+		end
+
+		scan(q, lx, x - 1, y + 1, o)
+		scan(q, lx, x - 1, y - 1, o)
+
+		return q:isEmpty()==false
+	end
+
+	return fill
+end

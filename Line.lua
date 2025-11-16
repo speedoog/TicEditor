@@ -43,8 +43,7 @@ function CreateLine(x0,y0,x1,y1,c)
 	local line = { }
 
 	function line:str()
-		s="line "..tostring(x0).." "..tostring(y0).." "..tostring(x1).." "..tostring(y1).." "..tostring(c)
-		return s
+		return "line "..tostring(x0).." "..tostring(y0).." "..tostring(x1).." "..tostring(y1).." "..tostring(c)
 	end
 
 	function line:Init()
@@ -60,6 +59,7 @@ function CreateLine(x0,y0,x1,y1,c)
 		self.e2 = self.err
 	end
 
+	-- return "continue"
 	function line:Draw(fnPix)
 		fnPix(self.x,self.y, c)
 

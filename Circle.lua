@@ -24,15 +24,12 @@ function PlotCircle(x, y, r, c)
 end
 
 function CreateCircle(x, y, r, c)
-	if c == nil then
-		c = 10
-	end
+	if c == nil then c = 10 end
 
 	local circle = {}
 
 	function circle:str()
-		s="circle "..tostring(x).." "..tostring(y).." "..tostring(r).." "..tostring(c)
-		return s
+		return "circle "..tostring(x).." "..tostring(y).." "..tostring(r).." "..tostring(c)
 	end
 
 	function circle:Init()

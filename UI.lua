@@ -12,7 +12,7 @@ function UI:DrawTooltips()
 end
 
 function UI:tooltip(text)
-  	local mx,my=mouse()
+  	local mx,my=self.mx,self.my
 	local offx=3
 	local offy=-8
 
@@ -22,28 +22,28 @@ function UI:tooltip(text)
 	table.insert(self.tooltips, {x=mx+offx,y=my+offy,c=12,t=text})
 end
 
-function UI:Button(x,y,w,h,c,text)
-   	rect(x,y,w,h,c)
-   	rectb(x,y,w,h,15)
-	local mx,my,ml,mm,mr=mouse()
+function UI:ButtonLogic(x,y,w,h,c,text)
+  	local mx,my,ml,mr=self.mx,self.my,self.dml,self.dmr
    	local hover =overlap(mx,my,x+1,x+w-1,y+1,y+h-1)
 	if hover then
 		self:tooltip(text)
-		return ml,mr 
+		if ml then self.dml=false end		-- invalidate l/r clicks
+		if mr then self.dmr=false end
+		return ml,mr
 	end
 	return false,false
+end
+
+function UI:Button(x,y,w,h,c,text)
+   	rect(x,y,w,h,c)
+   	rectb(x,y,w,h,15)
+	return self:ButtonLogic(x,y,w,h,c,text)
 end
 
 function UI:ButtonIcon(x,y,w,h,cbk,id,text)
    	rect(x,y,w,h,cbk)
    	spr(id,x+w/2-4,y+h/2-4,0)
-  	local mx,my,ml,mm,mr=mouse()
-   	local hover =overlap(mx,my,x+1,x+w-1,y+1,y+h-1)
-	if hover then
-		self:tooltip(text)
-		return ml,mr 
-	end
-	return false,false
+	return self:ButtonLogic(x,y,w,h,c,text)
 end
 
 function UI:ButtonTool(id,text)
@@ -85,6 +85,7 @@ function UI:DrawTools()
 	self:ButtonTool(259,"wait")
 	if self:ButtonTool(260,"trash") then
 		table.remove(scene.items, #scene.items)
+		ComputeTotalPix(scene)
 	end
 end
 
@@ -96,9 +97,8 @@ end
 function UI:DrawSequencer()
 	local c=13
 	ax=0
-	for k, ln in pairs(scene.items) do
---		trace(dump(ln))
-		sx=(ln.npix/scene.npix)*gSizeX
+	for k, item in pairs(scene.items) do
+		sx=(item.npix/scene.npix)*gSizeX
 		rect(ax,gSizeY-gSeqSize,ax+sx,gSeqSize,c)
 		if c==13 then c=15 else c=13 end
 	 	ax=ax+sx
@@ -125,28 +125,33 @@ function UI:Draw()
 end
 
 function UI:UpdateEditLine()
-	local mx,my,ml,mm,mr=mouse()
+  	local mx,my,dml,ml=self.mx,self.my,self.dml,self.ml
 
-	if ml then
-		if my>(gSizeY-gSeqSize) then
+	if my>(gSizeY-gSeqSize) then
+		if ml then
 			gPixTarget =(mx/gSizeX)*scene.npix
-		else
-			if btrace==false then
-				xStart=mx
-				yStart=my
-				btrace = true
-			else
-				if self.tool=="line" then
-					PlotLine(xStart,yStart,mx,my,self.color1)
-				elseif self.tool=="circle" then
-					local dx=mx-xStart
-					local dy=my-yStart
-					local r=floor(sqrt(dx*dx+dy*dy))
-					PlotCircle(xStart,yStart,r,self.color1)
-				end
-			end
+			dml=false
 		end
-	elseif btrace then
+	end
+
+	if dml and btrace==false then
+		xStart=mx
+		yStart=my
+		btrace = true
+	end
+
+	if btrace then
+		if self.tool=="line" then
+			PlotLine(xStart,yStart,mx,my,self.color1)
+		elseif self.tool=="circle" then
+			local dx=mx-xStart
+			local dy=my-yStart
+			local r=floor(sqrt(dx*dx+dy*dy))
+			PlotCircle(xStart,yStart,r,self.color1)
+		end
+	end
+
+	if btrace and ml==false then
 		local item=nil
 		if self.tool=="line" then
 			item = CreateLine(xStart,yStart,mx,my,self.color1)
@@ -155,23 +160,28 @@ function UI:UpdateEditLine()
 			local dy=my-yStart
 			local r=floor(sqrt(dx*dx+dy*dy))
 			item=CreateCircle(xStart,yStart,r,self.color1)
+		elseif self.tool=="fill" then
+			item=CreateFill(xStart,yStart,self.color1)
 		end
-		AppendItem(scene,item)
 
+		AppendItem(scene,item)
+		ComputeTotalPix(scene)
+		gPixTarget=scene.npix
 		btrace = false
 	end
 end
 
-function UI:DrawShapes()
+function UI:DrawItems()
 	local iPix=0
 	local bComplete=false
 	local bContinue
 
-	for k, ln in pairs(scene.items) do
+	for k, item in pairs(scene.items) do
 		bContinue=true
-		ln:Init()
+		item:Init()
 		while bContinue do
-			bContinue = ln:Draw(function(x,y,c) pix(x,y,c) iPix=iPix+1 end)
+			iPix=iPix+1
+			bContinue = item:Draw(function(x,y,c) pix(x,y,c) end)
 			if iPix>=gPixTarget then bComplete=true bContinue=false end
 		end
 		if bComplete then break end
@@ -182,6 +192,13 @@ function UI:Init()
     xStart = 0
     yStart = 0
     btrace = false
+	-- init mouse
+	local mx,my,ml,mm,mr=mouse()
+	self.mx=mx
+	self.my=my
+	self.ml=ml
+	self.mm=mm
+	self.mr=mr
 
     scene = Load()
 
@@ -189,12 +206,26 @@ function UI:Init()
 end
 
 function UI:Update()
+
+	-- update mouse
+	local mx,my,ml,mm,mr=mouse()
+	self.dmx = mx - self.mx
+	self.dmy = my - self.my
+	self.dml = ml and not self.ml
+	self.dmm = mm and not self.mm
+	self.dmr = mr and not self.mr
+	self.mx=mx
+	self.my=my
+	self.ml=ml
+	self.mm=mm
+	self.mr=mr
+
 	cls()
 
 	self:Draw()
 
     self:UpdateEditLine()
-    self:DrawShapes()
+    self:DrawItems()
 
 end
 

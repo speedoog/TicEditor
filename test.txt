@@ -88,3 +88,4 @@ circle 50 100 10 1
 circle 150 50 20 2
 circle 160 80 30 3
 circle 80 30 40 4
+fill 50 100 2
