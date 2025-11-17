@@ -74,7 +74,21 @@ function ComputeTotalPix(scene)
 	end
 end
 
+function scandir()
+	local filelist={}
+    local file = io.popen("dir *.txt /b")
+    for filename in file:lines() do
+		table.insert(filelist, filename)
+--		trace(filename)
+    end
+    file:close()
+    return filelist
+end
+
 function Load()
+
+--	p=scandir()
+
 	local scene={}
 	scene.npix=0
 	scene.items={}
