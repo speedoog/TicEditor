@@ -23,16 +23,6 @@ function FillString(array)
 	return s
 end
 
-function Save(file)
-	if file==nil then file="temp.txt" end
-	local f=fopen(file)
-	for k, item in pairs(scene.items) do
-		local sline = item:str().."\n"
-		fputs(sline, f)
-	end
-	fclose(f)
-end
-
 function IsEmpty(s)
 	return s == nil or s == ''
 end
@@ -79,33 +69,42 @@ function scandir()
     local file = io.popen("dir *.txt /b")
     for filename in file:lines() do
 		table.insert(filelist, filename)
---		trace(filename)
     end
     file:close()
     return filelist
 end
 
-function Load()
+function Load(fileName)
 
 --	p=scandir()
 
 	local scene={}
 	scene.npix=0
 	scene.items={}
-	local TotalPix=0
-	local f=fopen("test.txt", "r")
-	if f~=0 then
+
+	local f=io.open(fileName, "r")
+	if f~=nil then
+
 		while(true) do
-			local s=fgets(f)
-			if IsEmpty(s) then
-				break
-			else
-				local item =CreateItem(s)
-				AppendItem(scene, item)
-			end
+			local s=f:read()
+			if s==nil then break end
+			local item =CreateItem(s)
+			AppendItem(scene, item)
 		end
-		fclose(f)
+		io.close(f)
 	end
 	ComputeTotalPix(scene)
 	return scene
+end
+
+function Save(scene, fileName)
+	if fileName==nil then fileName="temp.txt" end
+	local f=io.open(fileName, "w")
+	if f~=nil then
+		for k, item in pairs(scene.items) do
+			local sline = item:str().."\n"
+			f:write(sline)
+		end
+	end
+   f:close()
 end

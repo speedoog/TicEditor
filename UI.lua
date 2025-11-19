@@ -200,7 +200,8 @@ function UI:Init()
 	self.mm=mm
 	self.mr=mr
 
-    scene = Load()
+    scene = Load("test.txt")
+--	Save(scene, "abc.txt")
 
 	UI:Draw()
 end
