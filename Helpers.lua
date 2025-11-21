@@ -1,6 +1,7 @@
 gSizeX	=240
 gSizeY	=136
 gWhite	=12
+gBlack	=15
 
 function dump(o)
    if type(o) == 'table' then
@@ -29,9 +30,4 @@ function DrawCrosshair(mx, my)
 	PlotLine(mx, my+min, mx, my+max, color)
 end
 
-
-function CirclePal(x,y,r,c)
-	circ(x, y, r, c)
-	circb(x, y, r, 15)
-end
 

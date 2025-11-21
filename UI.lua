@@ -22,11 +22,11 @@ function UI:tooltip(text)
 	table.insert(self.tooltips, {x=mx+offx,y=my+offy,c=12,t=text})
 end
 
-function UI:ButtonLogic(x,y,w,h,c,text)
+function UI:ButtonLogic(x,y,w,h,text)
   	local mx,my,ml,mr=self.mx,self.my,self.dml,self.dmr
    	local hover =overlap(mx,my,x+1,x+w-1,y+1,y+h-1)
 	if hover then
-		self:tooltip(text)
+		if text then self:tooltip(text) end
 		if ml then self.dml=false end		-- invalidate l/r clicks
 		if mr then self.dmr=false end
 		return ml,mr
@@ -37,13 +37,13 @@ end
 function UI:Button(x,y,w,h,c,text)
    	rect(x,y,w,h,c)
    	rectb(x,y,w,h,15)
-	return self:ButtonLogic(x,y,w,h,c,text)
+	return self:ButtonLogic(x,y,w,h,text)
 end
 
 function UI:ButtonIcon(x,y,w,h,cbk,id,text)
    	rect(x,y,w,h,cbk)
    	spr(id,x+w/2-4,y+h/2-4,0)
-	return self:ButtonLogic(x,y,w,h,c,text)
+	return self:ButtonLogic(x,y,w,h,text)
 end
 
 function UI:ButtonTool(id,text)
@@ -55,6 +55,20 @@ function UI:ButtonTool(id,text)
 	end
 	self._y=self._y+self._sz
 	return b
+end
+
+function UI:CirclePal(x,y,r,c,text)
+	circ(x, y, r, c)
+	circb(x, y, r, 15)
+  	local mx,my,ml,mr=self.mx,self.my,self.dml,self.dmr
+   	local hover = distance(x,y,mx,my)<=r
+	if hover then
+		self:tooltip(text)
+		if ml then self.dml=false end		-- invalidate l/r clicks
+		if mr then self.dmr=false end
+		return ml,mr
+	end
+	return false,false
 end
 
 function UI:DrawPalette()
@@ -71,27 +85,30 @@ function UI:DrawPalette()
 		if ml then self.color1=c end
 		if mr then self.color2=c end
 	end
-	CirclePal(ox+bsize*0.5, oy-bsize*0.6, bsize/2, self.color1)
-	CirclePal(ox+bsize*1.5, oy-bsize*0.6, bsize/2, self.color2)	
+	self:CirclePal(ox+bsize*0.5, oy-bsize*0.6, bsize/2, self.color1, "main")
+	self:CirclePal(ox+bsize*1.5, oy-bsize*0.6, bsize/2, self.color2, "alt")
 end
 
 function UI:DrawTools()
 	self._sz=12
 	self._x=gSizeX-self._sz
-	self._y=40
+	self._y=10
 	self:ButtonTool(256,"line")
 	self:ButtonTool(257,"circle")
-	self:ButtonTool(258,"fill")
-	self:ButtonTool(259,"wait")
-	if self:ButtonTool(260,"trash") then
+	self:ButtonTool(258,"elipse")
+	self:ButtonTool(259,"fill")
+	self:ButtonTool(260,"speed")
+	if self:ButtonTool(261,"trash") then
 		table.remove(scene.items, #scene.items)
 		ComputeTotalPix(scene)
 	end
 end
 
 function UI:DrawMenu()
-	rect(0,0,gSizeX,7,12)
-	print("Editor",1,1,15)
+	local h=7
+	rect(0,0,gSizeX,h,gWhite)
+	print("Editor",1,1,gBlack)
+	self:ButtonLogic(0,0,gSizeX,h)
 end
 
 function UI:DrawSequencer()

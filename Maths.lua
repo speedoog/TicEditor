@@ -27,3 +27,9 @@ function overlap(x,y,x0,x1,y0,y1)
    if x<x0 or x>x1 or y<y0 or y>y1 then return false end
    return true
 end
+
+function distance(x0,y0,x1,y1)
+	local dx=x0-x1
+	local dy=y0-y1
+	return sqrt(dx*dx+dy*dy)
+end
