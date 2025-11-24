@@ -95,7 +95,7 @@ function UI:DrawTools()
 	self._y=10
 	self:ButtonTool(256,"line")
 	self:ButtonTool(257,"circle")
-	self:ButtonTool(258,"elipse")
+	self:ButtonTool(258,"ellipse")
 	self:ButtonTool(259,"fill")
 	self:ButtonTool(260,"speed")
 	if self:ButtonTool(261,"trash") then
@@ -141,7 +141,7 @@ function UI:Draw()
 	vbank(0)
 end
 
-function UI:UpdateEditLine()
+function UI:UpdateItemEditor()
   	local mx,my,dml,ml=self.mx,self.my,self.dml,self.ml
 
 	if my>(gSizeY-gSeqSize) then
@@ -165,6 +165,10 @@ function UI:UpdateEditLine()
 			local dy=my-yStart
 			local r=floor(sqrt(dx*dx+dy*dy))
 			PlotCircle(xStart,yStart,r,self.color1)
+		elseif self.tool=="ellipse" then
+			local a=abs(mx-xStart)
+			local b=abs(my-yStart)
+			PlotEllipse(xStart,yStart,a,b,self.color1)
 		end
 	end
 
@@ -177,6 +181,10 @@ function UI:UpdateEditLine()
 			local dy=my-yStart
 			local r=floor(sqrt(dx*dx+dy*dy))
 			item=CreateCircle(xStart,yStart,r,self.color1)
+		elseif self.tool=="ellipse" then
+			local a=abs(mx-xStart)
+			local b=abs(my-yStart)
+			item=CreateEllipse(xStart,yStart,a,b,self.color1)
 		elseif self.tool=="fill" then
 			item=CreateFill(xStart,yStart,self.color1)
 		end
@@ -242,8 +250,9 @@ function UI:Update()
 
 	self:Draw()
 
-    self:UpdateEditLine()
-    self:DrawItems()
+	self:DrawItems()
+
+	self:UpdateItemEditor()
 
 end
 

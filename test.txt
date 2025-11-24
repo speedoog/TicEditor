@@ -84,8 +84,6 @@ line 189 71 189 68 10
 line 189 68 199 68 10
 line 199 68 187 62 10
 line 187 62 187 58 10
-circle 50 100 10 1
-circle 150 50 20 2
-circle 160 80 30 3
-circle 80 30 40 4
-fill 50 100 2
+ellipse 125 65 85 26 4
+circle 50 100 15 2
+fill 50 100 3

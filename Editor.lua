@@ -24,6 +24,7 @@ require "Queue"
 require "File"
 require "Line"
 require "Circle"
+require "Ellipse"
 require "Fill"
 
 UI = require "UI"

@@ -1,4 +1,4 @@
-dofile("Dither.lua")
+require "Dither"
 
 function FillPix(x,y,c)
 	matrixSize = 8

@@ -36,6 +36,8 @@ function CreateItem(l)
 		item=CreateCircle(p[2],p[3],p[4],p[5])
 	elseif p[1]=="fill" then
 		item=CreateFill(p[2],p[3],p[4])
+	elseif p[1]=="ellipse" then
+		item=CreateEllipse(p[2],p[3],p[4],p[5],p[6])
 	end
 
 	return item
