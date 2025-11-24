@@ -33,3 +33,11 @@ function distance(x0,y0,x1,y1)
 	local dy=y0-y1
 	return sqrt(dx*dx+dy*dy)
 end
+
+function rad2deg( r )
+	return r/math.pi*180
+end
+
+function deg2rad( d )
+	return d/180*math.pi
+end
