@@ -1,14 +1,17 @@
-local UI = { show=true, color1=2, color2=4, tooltips={}, tool="line", _x=0, _y=0,_sz=8 }
-gSeqSize=12
+local UI = { show=true, color1=2, color2=4, tooltips={}, mode="editor", tool="line", player="pause", _x=0, _y=0,_sz=10 }
+
+gSeqSize=UI._sz
 gPixTarget =0
 scene = {npix=0}
 
 
 function UI:DrawTooltips()
+	vbank(1)
 	for k, tip in pairs(self.tooltips) do
 	   	print(tip.t,tip.x,tip.y,tip.c,false,1,true)
 	end
 	self.tooltips = {}
+	vbank(0)
 end
 
 function UI:tooltip(text)
@@ -36,7 +39,7 @@ end
 
 function UI:Button(x,y,w,h,c,text)
    	rect(x,y,w,h,c)
-   	rectb(x,y,w,h,15)
+   	rectb(x,y,w,h,gGrey)
 	return self:ButtonLogic(x,y,w,h,text)
 end
 
@@ -47,7 +50,7 @@ function UI:ButtonIcon(x,y,w,h,cbk,id,text)
 end
 
 function UI:ButtonTool(id,text)
-	local cbk=15
+	local cbk=gGrey
 	if text==self.tool then cbk=2 end
 	local b = self:ButtonIcon(self._x,self._y,self._sz,self._sz,cbk,id,text)
 	if b then
@@ -57,9 +60,20 @@ function UI:ButtonTool(id,text)
 	return b
 end
 
+function UI:ButtonPlayer(id,text)
+	local cbk=gGrey
+	if text==self.player then cbk=2 end
+	local b = self:ButtonIcon(self._x,self._y,self._sz,self._sz,cbk,id,text)
+	if b then
+		self.player=text
+	end
+	self._x=self._x+self._sz
+	return b
+end
+
 function UI:CirclePal(x,y,r,c,text)
 	circ(x, y, r, c)
-	circb(x, y, r, 15)
+	circb(x, y, r, gGrey)
   	local mx,my,ml,mr=self.mx,self.my,self.dml,self.dmr
    	local hover = distance(x,y,mx,my)<=r
 	if hover then
@@ -90,7 +104,6 @@ function UI:DrawPalette()
 end
 
 function UI:DrawTools()
-	self._sz=12
 	self._x=gSizeX-self._sz
 	self._y=10
 	self:ButtonTool(256,"line")
@@ -113,43 +126,94 @@ end
 
 function UI:DrawSequencer()
 	local c=13
-	ax=0
+	local min=UI._sz
+	local max=gSizeX
+	apix=0
+	bpix=0
+	a=min
+	b=0
 	for k, item in pairs(scene.items) do
-		sx=(item.npix/scene.npix)*gSizeX
-		rect(ax,gSizeY-gSeqSize,ax+sx,gSeqSize,c)
-		if c==13 then c=15 else c=13 end
-	 	ax=ax+sx
+		bpix = apix+item.npix
+		b = remap(bpix,0,scene.npix,min,max)
+		rect(a,gSizeY-gSeqSize,b,gSeqSize,c)
+		if c==13 then c=gGrey else c=13 end
+	 	apix=bpix
+	 	a=b
 	end
+
+	local mx,my,dml,ml=self.mx,self.my,self.dml,self.ml
+	if my>(gSizeY-gSeqSize) then
+		if ml then
+			gPixTarget =(mx/gSizeX)*scene.npix
+			self.dml=false
+		end
+	end
+
 end
 
 function UI:Draw()
 	vbank(1)
 	cls()
+	vbank(0)
 
 	if keyp(49) then
 		self.show = not self.show
 	end
 
-	if self.show then		
-		self:DrawPalette()
-		self:DrawTools()
-		self:DrawMenu()
-		self:DrawSequencer()
+	if self.show then
+		if self.mode=="editor" then
+			self:DrawEditor()
+		elseif self.mode=="player" then
+			self:DrawPlayer()
+		end
 	end
+
 	self:DrawTooltips()
 
+end
+
+function UI:DrawEditor()
+	vbank(1)
+	if self:ButtonIcon(0,gSizeY-self._sz,self._sz,self._sz,gBlack,289,"editor") then
+		self.mode="player"
+	end
+
+	self:DrawPalette()
+	self:DrawTools()
+	self:DrawMenu()
+	self:DrawSequencer()
+	vbank(0)
+
+	self:UpdateItemEditor()
+end
+
+function UI:DrawPlayer()
+	vbank(1)
+	if self:ButtonIcon(0,gSizeY-self._sz,self._sz,self._sz,gBlack,288,"player") then
+		self.mode="editor"
+	end
+	self._x=self._sz+5
+	self._y=gSizeY-self._sz
+
+	if self.player=="play" then
+		gPixTarget=gPixTarget+1
+	end
+
+	if self:ButtonPlayer(304,"play") then
+		
+	end
+	if self:ButtonPlayer(305,"pause") then
+		
+	end
+	if self:ButtonPlayer(306,"begin") then
+		gPixTarget=0
+		self.player="pause"
+	end
 	vbank(0)
 end
 
 function UI:UpdateItemEditor()
   	local mx,my,dml,ml=self.mx,self.my,self.dml,self.ml
-
-	if my>(gSizeY-gSeqSize) then
-		if ml then
-			gPixTarget =(mx/gSizeX)*scene.npix
-			dml=false
-		end
-	end
 
 	if dml and btrace==false then
 		xStart=mx
@@ -231,13 +295,7 @@ function UI:Init()
 	UI:Draw()
 end
 
-function cubicBezier(t, p0, p1, p2, p3)
-	return (1 - t)^3*p0 + 3*(1 - t)^2*t*p1 + 3*(1 - t)*t^2*p2 + t^3*p3
-end
 
-function cubicBezier2(t,x0,y0,x1,y1,x2,y2,x3,y3)
-	return cubicBezier(t,x0,x1,x2,x3),cubicBezier(t,y0,y1,y2,y3)
-end
 
 function plotCubicBezier(x0,y0,x1,y1,x2,y2,x3,y3)
 --	DrawCrosshair(x0,y0)
@@ -267,8 +325,6 @@ function plotbidule(t)
 	plotCubicBezier(x0,y0, x1,y1, x2,y2, x3,y3)
 end
 
-t=-5
-
 function UI:Update()
 
 	-- update mouse
@@ -290,32 +346,7 @@ function UI:Update()
 
 	self:DrawItems()
 
-	self:UpdateItemEditor()
-
-	t=t+0.03
-
-	if keyp(49) then
-		t=0
-	end
-
-
-	--[[
-	x0=70	--+50*sin(t*1.23)
-	y0=70	--+50*cos(t*1.07)
-	x1=100+60*sin(t*1.74)
-	y1=70+60*cos(t*1.03)
-	x2=100+60*sin(t*1.14)
-	y2=70+60*cos(t*1.63)
-	x3=120+60*sin(t*1.44)
-	y3=70+60*cos(t*1.33)
-	plotCubicBezier(x0,y0, x1,y1, x2,y2, x3,y3)
-	]]
-
-	for s = 0,3,1 do
-		plotbidule(t+s)
-	end
-
---	plotCubicBezier(50,50, 30,20, 50,10, 200,100)
+	plotCubicBezier(50,50, 30,20, 50,10, 200,100)
 
 
 end

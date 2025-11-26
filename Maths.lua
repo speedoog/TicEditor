@@ -41,3 +41,11 @@ end
 function deg2rad( d )
 	return d/180*math.pi
 end
+
+function cubicBezier(t, p0, p1, p2, p3)
+	return (1 - t)^3*p0 + 3*(1 - t)^2*t*p1 + 3*(1 - t)*t^2*p2 + t^3*p3
+end
+
+function cubicBezier2(t,x0,y0,x1,y1,x2,y2,x3,y3)
+	return cubicBezier(t,x0,x1,x2,x3),cubicBezier(t,y0,y1,y2,y3)
+end

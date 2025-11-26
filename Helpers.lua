@@ -1,7 +1,8 @@
 gSizeX	=240
 gSizeY	=136
+gBlack	=0
 gWhite	=12
-gBlack	=15
+gGrey 	=15
 
 function dump(o)
    if type(o) == 'table' then
@@ -23,7 +24,7 @@ end
 function DrawCrosshair(mx, my)
 	local max = 2
 	local min = 1
-	local color = 15
+	local color = gGrey
 	PlotLine(mx-max, my, mx-min, my, color)
 	PlotLine(mx+min, my, mx+max, my, color)
 	PlotLine(mx, my-max, mx, my-min, color)
