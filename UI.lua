@@ -277,7 +277,79 @@ function UI:DrawItems()
 	end
 end
 
+MEM_Map=0x08000 
+
+FS={}
+
+function FS_Load(FS)
+	ptr=MEM_Map
+	local count=peek(ptr)
+	trace(count)
+
+	ptr=ptr+1
+	for ifile=0,count-1 do
+		local f={}
+		name=""
+		while peek(ptr)~=0 do
+			c=peek(ptr)
+			ptr=ptr+1
+			name=name..string.char(c)
+		end
+		ptr=ptr+1
+		szlo=peek(ptr) ptr=ptr+1
+		szhi=peek(ptr) ptr=ptr+1
+		szfull=szhi*256+szlo
+		trace(name.." "..tostring(szfull))
+
+		f.name = name
+		f.size = szfull 
+		table.insert(FS, f)
+	end
+
+	baseAddress = ptr
+	for k, f in pairs(FS) do
+		f.add=baseAddress
+		baseAddress=baseAddress+f.size
+
+		c=peek(f.add)
+		trace(c)
+	end
+
+
+
+end
+
+function FS_LoadScene(file)
+	local scene={}
+	scene.npix=0
+	scene.items={}
+	
+	f=FS[2]
+	ptr=f.add
+	while peek(ptr)~=0 do
+		b=peek(ptr) ptr=ptr+1
+		cmd=string.char(b)
+		if cmd=='l' then
+			x0=peek(ptr) ptr=ptr+1
+			y0=peek(ptr) ptr=ptr+1
+			x1=peek(ptr) ptr=ptr+1
+			y1=peek(ptr) ptr=ptr+1
+			c=peek(ptr)  ptr=ptr+1
+			item=CreateLine(x0,y0,x1,y1,c)
+			AppendItem(scene, item)
+		end
+		
+	end
+
+	ComputeTotalPix(scene)
+	return scene
+end
+
+
 function UI:Init()
+
+	FS_Load(FS)
+
     xStart = 0
     yStart = 0
     btrace = false
@@ -289,7 +361,9 @@ function UI:Init()
 	self.mm=mm
 	self.mr=mr
 
-    scene = Load("test.txt")
+ --   scene = Load("test.txt")
+	scene = FS_LoadScene("test.txt")
+
 --	Save(scene, "abc.txt")
 
 	UI:Draw()
