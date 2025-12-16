@@ -66,6 +66,13 @@ function scan(q, lx, rx, y, o)
 end
 
 
+function CreateFillMem(ptr)
+	local p,item
+	ptr,p=Pop(ptr,3)
+	item=CreateFill(p[1],p[2],p[3])
+	return ptr,item
+end
+
 
 function CreateFill(x,y,c)
 	if c==nil then c=10 end

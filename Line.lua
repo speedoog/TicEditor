@@ -36,6 +36,12 @@ function PlotLine(x0,y0,x1,y1,c)
 	end
 end
 
+function CreateLineMem(ptr)
+	local p,item
+	ptr,p=Pop(ptr,5)
+	item=CreateLine(p[1],p[2],p[3],p[4],p[5])
+	return ptr,item
+end
 
 function CreateLine(x0,y0,x1,y1,c)
 	if c==nil then c=10 end

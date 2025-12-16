@@ -23,6 +23,14 @@ function PlotCircle(x, y, r, c)
 	end
 end
 
+function CreateCircleMem(ptr)
+	local p,item
+	ptr,p=Pop(ptr,4)
+	item=CreateCircle(p[1],p[2],p[3],p[4])
+	return ptr,item
+end
+
+
 function CreateCircle(x, y, r, c)
 	if c == nil then c = 10 end
 

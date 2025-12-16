@@ -34,6 +34,14 @@ function PlotEllipse(xm, ym, a, b, c)
 	end
 end
 
+function CreateEllipseMem(ptr)
+	local p,item
+	ptr,p=Pop(ptr,5)
+	item=CreateEllipse(p[1],p[2],p[3],p[4],p[5])
+	return ptr,item
+end
+
+
 function CreateEllipse(xm, ym, a, b, c)
 	if c == nil then c = 10 end
 

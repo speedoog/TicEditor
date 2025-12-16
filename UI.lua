@@ -284,8 +284,6 @@ FS={}
 function FS_Load(FS)
 	ptr=MEM_Map
 	local count=peek(ptr)
-	trace(count)
-
 	ptr=ptr+1
 	for ifile=0,count-1 do
 		local f={}
@@ -299,8 +297,6 @@ function FS_Load(FS)
 		szlo=peek(ptr) ptr=ptr+1
 		szhi=peek(ptr) ptr=ptr+1
 		szfull=szhi*256+szlo
-		trace(name.." "..tostring(szfull))
-
 		f.name = name
 		f.size = szfull 
 		table.insert(FS, f)
@@ -310,35 +306,55 @@ function FS_Load(FS)
 	for k, f in pairs(FS) do
 		f.add=baseAddress
 		baseAddress=baseAddress+f.size
-
 		c=peek(f.add)
-		trace(c)
 	end
+end
 
+function Pop(address, count)
+	local params={}
+	for i=0,count-1 do
+		table.insert(params, peek(address+i))
+	end
+	return address+count,params
+end
 
-
+function FS_FindFile(fn)
+	for k, f in pairs(FS) do
+		if f.name==fn then
+			return f
+		end
+	end
+	return nil
 end
 
 function FS_LoadScene(file)
 	local scene={}
 	scene.npix=0
 	scene.items={}
-	
-	f=FS[2]
+
+	local f=FS_FindFile(file)
+	if f==nil then return scene end
+
 	ptr=f.add
-	while peek(ptr)~=0 do
+	while true do
 		b=peek(ptr) ptr=ptr+1
+		if b==0 then break end
+		
+		item=nil
 		cmd=string.char(b)
 		if cmd=='l' then
-			x0=peek(ptr) ptr=ptr+1
-			y0=peek(ptr) ptr=ptr+1
-			x1=peek(ptr) ptr=ptr+1
-			y1=peek(ptr) ptr=ptr+1
-			c=peek(ptr)  ptr=ptr+1
-			item=CreateLine(x0,y0,x1,y1,c)
+			ptr,item = CreateLineMem(ptr)
+		elseif cmd=='e' then
+			ptr,item = CreateEllipseMem(ptr)
+		elseif cmd=='c' then
+			ptr,item = CreateCircleMem(ptr)
+		elseif cmd=='f' then
+			ptr,item = CreateFillMem(ptr)
+		end
+
+		if item~=nil then
 			AppendItem(scene, item)
 		end
-		
 	end
 
 	ComputeTotalPix(scene)
