@@ -377,8 +377,10 @@ function UI:Init()
 	self.mm=mm
 	self.mr=mr
 
- --   scene = Load("test.txt")
-	scene = FS_LoadScene("test.txt")
+--  scene = Load("test.txt")
+	scene = Load("moutain.txt")
+
+--	scene = FS_LoadScene("test.txt")
 
 --	Save(scene, "abc.txt")
 
@@ -436,7 +438,7 @@ function UI:Update()
 
 	self:DrawItems()
 
-	plotCubicBezier(50,50, 30,20, 50,10, 200,100)
+--	plotCubicBezier(50,50, 30,20, 50,10, 200,100)
 
 
 end
