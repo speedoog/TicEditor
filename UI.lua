@@ -377,8 +377,8 @@ function UI:Init()
 	self.mm=mm
 	self.mr=mr
 
---  scene = Load("test.txt")
-	scene = Load("moutain.txt")
+  scene = Load("Spectrals.txt")
+--	scene = Load("moutain.txt")
 
 --	scene = FS_LoadScene("test.txt")
 
