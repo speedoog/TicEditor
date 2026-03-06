@@ -1,4 +1,4 @@
-local UI = { show=true, color1=2, color2=4, tooltips={}, mode="editor", tool="line", player="pause", _x=0, _y=0,_sz=10 }
+local UI = { show=true, color1=2, color2=4, tooltips={}, iCurItem=0, mode="editor", tool="line", player="pause", _x=0, _y=0,_sz=10 }
 
 gSeqSize=UI._sz
 gPixTarget =0
@@ -120,7 +120,7 @@ end
 function UI:DrawMenu()
 	local h=7
 	rect(0,0,gSizeX,h,gWhite)
-	print("Editor",1,1,gBlack)
+	print(string.format("Item %d/%d", self.iCurItem, #scene.items),1,1,gBlack)
 	self:ButtonLogic(0,0,gSizeX,h)
 end
 
@@ -268,6 +268,7 @@ function UI:DrawItems()
 	for k, item in pairs(scene.items) do
 		bContinue=true
 		item:Init()
+		self.iCurItem=k
 		while bContinue do
 			iPix=iPix+1
 			bContinue = item:Draw(function(x,y,c) pix(x,y,c) end)
