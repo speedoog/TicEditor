@@ -30,8 +30,13 @@ end
 function CreateItem(l)
 	local p=Split(l)
 	local item
-	if p[1]=="line" then
-		item=CreateLine(p[2],p[3],p[4],p[5],p[6])
+	if p[1]=="l" then
+		local len=p[2]
+		item=CreatePolyLine(p[3])
+		local ptcount=(len-1)>>1
+		for i=1,ptcount do
+			item.pts[i]={p[2+i*2], p[3+i*2]}
+		end
 	elseif p[1]=="circle" then
 		item=CreateCircle(p[2],p[3],p[4],p[5])
 	elseif p[1]=="fill" then
@@ -50,19 +55,16 @@ function AppendItem(scene, item)
 end
 
 function ComputeTotalPix(scene)
-	scene.npix=0
-
-	cls()
-	local bContinue
+	scene.npix = 0
 	for k, item in pairs(scene.items) do
 		item:Init()
-		item.npix=0
-		bContinue=true
-		while bContinue do
-			item.npix=item.npix+1
-			bContinue = item:Draw(function(x,y,c) pix(x,y,c) end)
+		item.npix = 0
+		local iPix = 1
+		while iPix > 0 do
+			iPix = item:Draw()
+			item.npix = item.npix + iPix
 		end
-		scene.npix=scene.npix+item.npix
+		scene.npix = scene.npix + item.npix
 	end
 end
 
@@ -80,9 +82,11 @@ function Load(fileName)
 
 --	p=scandir()
 
-	local scene={}
-	scene.npix=0
-	scene.items={}
+	local scene={
+		filename=fileName,
+		npix=0,
+		items={},
+	}
 
 	local f=io.open(fileName, "r")
 	if f~=nil then
@@ -100,12 +104,21 @@ function Load(fileName)
 end
 
 function Save(scene, fileName)
-	if fileName==nil then fileName="temp.txt" end
+	if fileName==nil then
+		fileName=scene.filename
+	end
 	local f=io.open(fileName, "w")
 	if f~=nil then
 		for k, item in pairs(scene.items) do
-			local sline = item:str().."\n"
-			f:write(sline)
+			local s=item:store()
+			f:write(item.type)
+			f:write(" ")
+			f:write(#s)
+			for k,v in pairs(s) do
+				f:write(" ")
+				f:write(v)
+			end
+			f:write("\n")
 		end
 	end
    f:close()

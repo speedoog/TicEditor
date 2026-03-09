@@ -18,7 +18,7 @@ function dump(o)
 end
 
 function HideCursor()
-    poke(0x3FFB,1)
+   poke(0x3FFB,0)
 end
 
 function DrawCrosshair(mx, my)

@@ -88,3 +88,78 @@ function CreateLine(x0,y0,x1,y1,c)
 
 	return line
 end
+
+function CreatePolyLine(c)
+	if c==nil then c=10 end
+
+	local item =
+	{
+		c=c,
+		pts={},
+		i=1,
+		type="l",
+		store=function(self)
+			local s={}
+			table.insert(s, self.c)
+			for k,v in pairs(self.pts) do
+				table.insert(s, v[1])
+				table.insert(s, v[2])
+			end
+			return	s
+		end,
+		InitSeg=function(self, i)
+			self.i = i
+
+			if #self.pts<2 then return end
+
+			local p0=self.pts[i]
+			local p1=self.pts[i+1]
+			self.x  = p0[1]
+			self.y  = p0[2]
+			self.x1 = p1[1]
+			self.y1 = p1[2]
+			self.dx = abs(self.x1-self.x)
+			self.dy =-abs(self.y1-self.y)
+			
+			if self.x<self.x1 then self.sx=1 else self.sx=-1 end
+			if self.y<self.y1 then self.sy=1 else self.sy=-1 end
+			
+			self.err= self.dx+self.dy -- error value e_xy
+			self.e2 = self.err
+		end,
+		Init=function(self)
+			self:InitSeg(1)
+		end,
+
+		Draw=function(self, fnPix)
+			if fnPix ~= nil then
+				fnPix(self.x, self.y, c)
+			end
+
+			while self.x==self.x1 and self.y==self.y1 do	-- completed line ?
+				local i=self.i+1
+				if i>=#self.pts then
+					return 0					-- was last segment
+				else
+					self:InitSeg(i)				-- next segment
+				end
+			end
+
+			self.e2 = 2*self.err
+			
+			if self.e2>=self.dy then -- e_xy+e_x > 0
+				self.err=self.err+self.dy
+				self.x =self.x+self.sx
+			end
+			
+			if self.e2<=self.dx then -- e_xy+e_y < 0
+				self.err=self.err+self.dx
+				self.y =self.y+self.sy
+			end
+			
+			return 1
+		end
+		
+	}
+	return item
+end

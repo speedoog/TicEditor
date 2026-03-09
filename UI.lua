@@ -114,6 +114,7 @@ function UI:DrawTools()
 	self:ButtonTool(267,"speed")
 	if self:ButtonTool(268,"trash") then
 		table.remove(scene.items, #scene.items)
+		self.iCurItem=#scene.items
 		ComputeTotalPix(scene)
 	end
 end
@@ -171,6 +172,10 @@ function UI:Draw()
 
 	self:DrawTooltips()
 
+	vbank(1)
+	DrawCrosshair(self.mx,self.my)
+	vbank(0)
+
 end
 
 function UI:DrawEditor()
@@ -214,14 +219,60 @@ function UI:DrawPlayer()
 end
 
 function UI:UpdateItemEditor()
-  	local mx,my,dml,ml=self.mx,self.my,self.dml,self.ml
+  	local mx,my,dml,dmr,ml=self.mx,self.my,self.dml,self.dmr,self.ml
 
-	if dml and btrace==false then
-		xStart=mx
-		yStart=my
-		btrace = true
+	local item
+
+	if dml then
+		if not btrace then
+			if self.tool=="line" then
+				item = CreatePolyLine(self.color1)
+			end
+			
+			if item then
+				btrace = true
+				table.insert(item.pts, {mx,my})
+				table.insert(item.pts, {mx,my})
+				AppendItem(scene,item)
+				ComputeTotalPix(scene)
+				gPixTarget=scene.npix
+				self.iCurItem = #scene.items
+			end
+		else
+			item = scene.items[self.iCurItem]
+			local lastpoint=item.pts[#item.pts-1]
+			if lastpoint[1]==mx and lastpoint[2]==my then	-- same point = end
+				table.remove(item.pts, #item.pts)			-- remove last temp point (duplicate)
+				btrace=false								-- stop
+				Save(scene)
+			else
+				item.pts[#item.pts]={mx,my}					-- update point
+				table.insert(item.pts, {mx,my})				-- add new one
+				ComputeTotalPix(scene)
+				gPixTarget=scene.npix
+			end
+		end
 	end
 
+	if btrace then
+		if dmr then
+			item = scene.items[self.iCurItem]
+			if #item.pts<=2 then							-- empty item
+				table.remove(scene.items, self.iCurItem)	-- todo may be fix remove in middle of list ?
+				self.iCurItem=#scene.items
+				btrace = false
+			else
+				table.remove(item.pts, #item.pts)
+			end
+		else
+			item = scene.items[self.iCurItem]
+			item.pts[#item.pts]={mx,my}
+			ComputeTotalPix(scene)
+			gPixTarget=scene.npix
+		end
+	end
+
+	--[[
 	if btrace then
 		if self.tool=="line" then
 			PlotLine(xStart,yStart,mx,my,self.color1)
@@ -259,6 +310,8 @@ function UI:UpdateItemEditor()
 		gPixTarget=scene.npix
 		btrace = false
 	end
+	]]
+
 end
 
 function UI:DrawItems()
@@ -269,10 +322,11 @@ function UI:DrawItems()
 	for k, item in pairs(scene.items) do
 		bContinue=true
 		item:Init()
-		self.iCurItem=k
+--		self.iCurItem=k
 		while bContinue do
-			iPix=iPix+1
-			bContinue = item:Draw(function(x,y,c) pix(x,y,c) end)
+			local i=item:Draw(function(x,y,c) pix(x,y,c) end)
+			bContinue = i>0
+			iPix=iPix+i
 			if iPix>=gPixTarget then bComplete=true bContinue=false end
 		end
 		if bComplete then break end
@@ -366,6 +420,7 @@ end
 
 function UI:Init()
 
+	HideCursor()
 	FS_Load(FS)
 
     xStart = 0
@@ -379,11 +434,11 @@ function UI:Init()
 	self.mm=mm
 	self.mr=mr
 
-  scene = Load("Spectrals.txt")
---	scene = Load("moutain.txt")
+--  	scene = Load("Spectrals.txt")
+	scene = Load("moutain.txt")
+	gPixTarget=scene.npix
 
 --	scene = FS_LoadScene("test.txt")
-
 --	Save(scene, "abc.txt")
 
 	UI:Draw()
