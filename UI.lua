@@ -2,7 +2,7 @@ local UI = { show=true, color1=2, color2=4, tooltips={}, iCurItem=0, mode="edito
 
 gSeqSize=UI._sz
 gPixTarget =0
-scene = {npix=0}
+scene = {nPix=0}
 
 
 function UI:DrawTooltips()
@@ -14,7 +14,7 @@ function UI:DrawTooltips()
 	vbank(0)
 end
 
-function UI:tooltip(text)
+function UI:Tooltip(text)
   	local mx,my=self.mx,self.my
 	local offx=3
 	local offy=-8
@@ -29,7 +29,7 @@ function UI:ButtonLogic(x,y,w,h,text)
   	local mx,my,ml,mr=self.mx,self.my,self.dml,self.dmr
    	local hover =overlap(mx,my,x+1,x+w-1,y+1,y+h-1)
 	if hover then
-		if text then self:tooltip(text) end
+		if text then self:Tooltip(text) end
 		if ml then self.dml=false end		-- invalidate l/r clicks
 		if mr then self.dmr=false end
 		return ml,mr
@@ -77,7 +77,7 @@ function UI:CirclePal(x,y,r,c,text)
   	local mx,my,ml,mr=self.mx,self.my,self.dml,self.dmr
    	local hover = distance(x,y,mx,my)<=r
 	if hover then
-		self:tooltip(text)
+		self:Tooltip(text)
 		if ml then self.dml=false end		-- invalidate l/r clicks
 		if mr then self.dmr=false end
 		return ml,mr
@@ -106,6 +106,7 @@ end
 function UI:DrawTools()
 	self._x=gSizeX-self._sz
 	self._y=10
+	local prevTool=self.tool
 	self:ButtonTool(256,"line")
 	self:ButtonTool(257,"circle")
 	self:ButtonTool(258,"ellipse")
@@ -113,9 +114,10 @@ function UI:DrawTools()
 	self:ButtonTool(260,"fill")
 	self:ButtonTool(267,"speed")
 	if self:ButtonTool(268,"trash") then
-		table.remove(scene.items, #scene.items)
-		self.iCurItem=#scene.items
+		table.remove(scene.items, self.iCurItem)
 		ComputeTotalPix(scene)
+		self:SetCurrentItem(self.iCurItem-1)
+		self.tool=prevTool							-- restore prev tool
 	end
 end
 
@@ -135,8 +137,8 @@ function UI:DrawSequencer()
 	a=min
 	b=0
 	for k, item in pairs(scene.items) do
-		bpix = apix+item.npix
-		b = remap(bpix,0,scene.npix,min,max)
+		bpix = apix+item.nPix
+		b = remap(bpix,0,scene.nPix,min,max)
 		rect(a,gSizeY-gSeqSize,b,gSeqSize,c)
 		if c==13 then c=gGrey else c=13 end
 	 	apix=bpix
@@ -146,11 +148,22 @@ function UI:DrawSequencer()
 	local mx,my,dml,ml=self.mx,self.my,self.dml,self.ml
 	if my>(gSizeY-gSeqSize) then
 		if ml then
-			gPixTarget =(mx/gSizeX)*scene.npix
+			gPixTarget =(mx/gSizeX)*scene.nPix
 			self.dml=false
 		end
 	end
+end
 
+function UI:SetCurrentItem(iItem)
+	self.iCurItem=clamp(iItem,0,#scene.items)
+	self:SyncPixTarget()
+end
+
+function UI:SyncPixTarget()
+	gPixTarget=0
+	for i=1,self.iCurItem do
+		gPixTarget=gPixTarget+scene.items[i].nPix
+	end
 end
 
 function UI:Draw()
@@ -158,14 +171,17 @@ function UI:Draw()
 	cls()
 	vbank(0)
 
-	if keyp(49) then
+	if keyp(gKeyTab) then
 		self.show = not self.show
 	end
 
-	if self.show then
-		if self.mode=="editor" then
+	if self.mode=="editor" then
+		if self.show then
 			self:DrawEditor()
-		elseif self.mode=="player" then
+		end
+		self:UpdateItemEditor()
+	elseif self.mode=="player" then
+		if self.show then
 			self:DrawPlayer()
 		end
 	end
@@ -180,17 +196,26 @@ end
 
 function UI:DrawEditor()
 	vbank(1)
+
+	if keyp(gKeyRight,20,1) then
+		self:SetCurrentItem(self.iCurItem+1)
+	end
+	if keyp(gKeyLeft,20,1) then
+		self:SetCurrentItem(self.iCurItem-1)
+	end
+
 	if self:ButtonIcon(0,gSizeY-self._sz,self._sz,self._sz,gBlack,289,"editor") then
 		self.mode="player"
+	end
+
+	if self:ButtonIcon(0,20,self._sz,self._sz,gGrey,273,"Save") then
+		Save(scene)
 	end
 
 	self:DrawPalette()
 	self:DrawTools()
 	self:DrawMenu()
 	self:DrawSequencer()
-	vbank(0)
-
-	self:UpdateItemEditor()
 end
 
 function UI:DrawPlayer()
@@ -202,7 +227,7 @@ function UI:DrawPlayer()
 	self._y=gSizeY-self._sz
 
 	if self.player=="play" then
-		gPixTarget=gPixTarget+1
+		gPixTarget=gPixTarget+2
 	end
 
 	if self:ButtonPlayer(304,"play") then
@@ -224,51 +249,48 @@ function UI:UpdateItemEditor()
 	local item
 
 	if dml then
-		if not btrace then
+		if not btrace then									-- 1st click
 			if self.tool=="line" then
 				item = CreatePolyLine(self.color1)
 			end
 			
-			if item then
+			if item then									-- item valid, continue init
 				btrace = true
 				table.insert(item.pts, {mx,my})
 				table.insert(item.pts, {mx,my})
-				AppendItem(scene,item)
+				AppendItem(scene,item, self.iCurItem+1)
 				ComputeTotalPix(scene)
-				gPixTarget=scene.npix
-				self.iCurItem = #scene.items
+				self:SetCurrentItem(self.iCurItem+1)
 			end
-		else
+		else												-- New click
 			item = scene.items[self.iCurItem]
 			local lastpoint=item.pts[#item.pts-1]
 			if lastpoint[1]==mx and lastpoint[2]==my then	-- same point = end
 				table.remove(item.pts, #item.pts)			-- remove last temp point (duplicate)
 				btrace=false								-- stop
-				Save(scene)
 			else
 				item.pts[#item.pts]={mx,my}					-- update point
 				table.insert(item.pts, {mx,my})				-- add new one
-				ComputeTotalPix(scene)
-				gPixTarget=scene.npix
 			end
 		end
 	end
 
 	if btrace then
-		if dmr then
+		if dmr then											-- right click
 			item = scene.items[self.iCurItem]
-			if #item.pts<=2 then							-- empty item
+			if #item.pts<=2 then							-- empty item -> Destroy item
 				table.remove(scene.items, self.iCurItem)	-- todo may be fix remove in middle of list ?
-				self.iCurItem=#scene.items
+				ComputeTotalPix(scene)
+				self:SetCurrentItem(self.iCurItem-1)
 				btrace = false
-			else
+			else											-- remove last point
 				table.remove(item.pts, #item.pts)
 			end
 		else
-			item = scene.items[self.iCurItem]
+			item = scene.items[self.iCurItem]				-- currently editing update (classic case)
 			item.pts[#item.pts]={mx,my}
 			ComputeTotalPix(scene)
-			gPixTarget=scene.npix
+			self:SyncPixTarget()
 		end
 	end
 
@@ -307,7 +329,7 @@ function UI:UpdateItemEditor()
 
 		AppendItem(scene,item)
 		ComputeTotalPix(scene)
-		gPixTarget=scene.npix
+		gPixTarget=scene.nPix
 		btrace = false
 	end
 	]]
@@ -322,12 +344,15 @@ function UI:DrawItems()
 	for k, item in pairs(scene.items) do
 		bContinue=true
 		item:Init()
---		self.iCurItem=k
+
 		while bContinue do
-			local i=item:Draw(function(x,y,c) pix(x,y,c) end)
-			bContinue = i>0
-			iPix=iPix+i
-			if iPix>=gPixTarget then bComplete=true bContinue=false end
+			if iPix>=gPixTarget then
+				bComplete=true bContinue=false
+			else
+				local i=item:Draw(function(x,y,c) pix(x,y,c) end)
+				bContinue = i>0
+				iPix=iPix+i
+			end
 		end
 		if bComplete then break end
 	end
@@ -385,7 +410,7 @@ end
 
 function FS_LoadScene(file)
 	local scene={}
-	scene.npix=0
+	scene.nPix=0
 	scene.items={}
 
 	local f=FS_FindFile(file)
@@ -436,7 +461,9 @@ function UI:Init()
 
 --  	scene = Load("Spectrals.txt")
 	scene = Load("moutain.txt")
-	gPixTarget=scene.npix
+	gPixTarget=scene.nPix
+	self:SetCurrentItem(#scene.items)	-- seek to last
+
 
 --	scene = FS_LoadScene("test.txt")
 --	Save(scene, "abc.txt")

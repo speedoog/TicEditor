@@ -4,6 +4,13 @@ gBlack	=0
 gWhite	=12
 gGrey 	=15
 
+-- keys (https://skyelynwaddell.github.io/tic80-manual-cheatsheet/)
+gKeyUp   = 58
+gKeyDown = 59
+gKeyLeft = 60
+gKeyRight= 61
+gKeyTab	 = 49
+
 function dump(o)
    if type(o) == 'table' then
       local s = '{ '

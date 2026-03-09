@@ -48,23 +48,23 @@ function CreateItem(l)
 	return item
 end
 
-function AppendItem(scene, item)
+function AppendItem(scene, item, iPos)
 	if item~=nil then
-		table.insert(scene.items, item)
+		table.insert(scene.items, iPos, item)
 	end
 end
 
 function ComputeTotalPix(scene)
-	scene.npix = 0
+	scene.nPix = 0
 	for k, item in pairs(scene.items) do
 		item:Init()
-		item.npix = 0
+		item.nPix = 0
 		local iPix = 1
 		while iPix > 0 do
 			iPix = item:Draw()
-			item.npix = item.npix + iPix
+			item.nPix = item.nPix + iPix
 		end
-		scene.npix = scene.npix + item.npix
+		scene.nPix = scene.nPix + item.nPix
 	end
 end
 
@@ -84,7 +84,7 @@ function Load(fileName)
 
 	local scene={
 		filename=fileName,
-		npix=0,
+		nPix=0,
 		items={},
 	}
 
@@ -95,7 +95,7 @@ function Load(fileName)
 			local s=f:read()
 			if s==nil then break end
 			local item =CreateItem(s)
-			AppendItem(scene, item)
+			AppendItem(scene, item, #scene.items+1)
 		end
 		io.close(f)
 	end

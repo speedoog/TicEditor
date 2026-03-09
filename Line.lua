@@ -94,6 +94,7 @@ function CreatePolyLine(c)
 
 	local item =
 	{
+		nPix=0,
 		c=c,
 		pts={},
 		i=1,
