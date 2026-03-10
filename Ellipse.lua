@@ -64,10 +64,12 @@ function CreateEllipse(xm, ym, a, b, c)
 	function ellipse:Draw(fnPix)
 		s = self
 		if s.x<=0 then
-			fnPix(xm-s.x, ym+s.y, c);
-			fnPix(xm+s.x, ym+s.y, c);
-			fnPix(xm+s.x, ym-s.y, c);
-			fnPix(xm-s.x, ym-s.y, c);
+			if fnPix~=nil then
+				fnPix(xm-s.x, ym+s.y, c);
+				fnPix(xm+s.x, ym+s.y, c);
+				fnPix(xm+s.x, ym-s.y, c);
+				fnPix(xm-s.x, ym-s.y, c);
+			end
 
 			s.e2 = 2*s.err;
 			if (s.e2 >= (s.x*2+1)*s.b2) then		-- e_xy+e_x > 0
@@ -80,18 +82,20 @@ function CreateEllipse(xm, ym, a, b, c)
 				s.err = s.err+(s.y*2+1)*s.a2
 			end
 
-			return true
+			return 4
 		elseif s.y<b then
-			fnPix(xm, ym+s.y,c)
-			fnPix(xm, ym-s.y,c)
+			if fnPix~=nil then
+				fnPix(xm, ym+s.y,c)
+				fnPix(xm, ym-s.y,c)
+			end
 			S.y=s.y+1
 		end
 
 		if s.y>b then
-			return true
+			return 2
 		end
 
-		return false
+		return 0
 	end
 
 	return ellipse

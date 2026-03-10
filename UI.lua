@@ -252,6 +252,8 @@ function UI:UpdateItemEditor()
 		if not btrace then									-- 1st click
 			if self.tool=="line" then
 				item = CreatePolyLine(self.color1)
+			elseif self.tool=="spline" then
+				item = CreateSpline(self.color1)
 			end
 			
 			if item then									-- item valid, continue init
@@ -460,7 +462,7 @@ function UI:Init()
 	self.mr=mr
 
 --  	scene = Load("Spectrals.txt")
-	scene = Load("moutain.txt")
+	scene = Load("test.txt")
 	gPixTarget=scene.nPix
 	self:SetCurrentItem(#scene.items)	-- seek to last
 

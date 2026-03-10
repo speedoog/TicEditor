@@ -7,7 +7,9 @@ function PixPatch(x,y,c)
 	pix(x+1,y+1, c)
 end
 
-function PlotLine(x0,y0,x1,y1,c)
+function PlotLine(x0,y0,x1,y1,c,fn)
+	if fn==nil then fn=pix end
+
 	local dx = abs(x1-x0)
 	local dy =-abs(y1-y0)
 
@@ -18,8 +20,10 @@ function PlotLine(x0,y0,x1,y1,c)
 	local err=dx+dy -- error value e_xy
 	local e2 = err
 	local b=true
+	local iPix=0
 	while(b) do
-		pix(x0,y0, c)
+		iPix=iPix+1
+		fn(x0,y0, c)
 		e2 = 2*err
 		if e2>=dy then -- e_xy+e_x > 0
 			if x0==x1 then b=false end
@@ -32,8 +36,8 @@ function PlotLine(x0,y0,x1,y1,c)
 			err=err+dx
 			y0 =y0+sy
 		end
-
 	end
+	return iPix
 end
 
 function CreateLineMem(ptr)
@@ -134,7 +138,7 @@ function CreatePolyLine(c)
 
 		Draw=function(self, fnPix)
 			if fnPix ~= nil then
-				fnPix(self.x, self.y, c)
+				fnPix(self.x, self.y, self.c)
 			end
 
 			while self.x==self.x1 and self.y==self.y1 do	-- completed line ?

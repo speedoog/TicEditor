@@ -30,9 +30,15 @@ end
 function CreateItem(l)
 	local p=Split(l)
 	local item
+	local len=p[2]
 	if p[1]=="l" then
-		local len=p[2]
 		item=CreatePolyLine(p[3])
+		local ptcount=(len-1)>>1
+		for i=1,ptcount do
+			item.pts[i]={p[2+i*2], p[3+i*2]}
+		end
+	elseif p[1]=="s" then
+		item=CreateSpline(p[3])
 		local ptcount=(len-1)>>1
 		for i=1,ptcount do
 			item.pts[i]={p[2+i*2], p[3+i*2]}

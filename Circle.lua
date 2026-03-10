@@ -52,14 +52,16 @@ function CreateCircle(x, y, r, c)
 	function circle:Draw(fnPix)
 		s = self
 		if (s.px <= s.py) then
-			fnPix((s.px + x), (s.py + y), c)
-			fnPix((s.py + x), (s.px + y), c)
-			fnPix((-s.px + x), (s.py + y), c)
-			fnPix((-s.py + x), (s.px + y), c)
-			fnPix((s.px + x), (-s.py + y), c)
-			fnPix((s.py + x), (-s.px + y), c)
-			fnPix((-s.px + x), (-s.py + y), c)
-			fnPix((-s.py + x), (-s.px + y), c)
+			if fnPix~=nil then
+				fnPix((s.px + x), (s.py + y), c)
+				fnPix((s.py + x), (s.px + y), c)
+				fnPix((-s.px + x), (s.py + y), c)
+				fnPix((-s.py + x), (s.px + y), c)
+				fnPix((s.px + x), (-s.py + y), c)
+				fnPix((s.py + x), (-s.px + y), c)
+				fnPix((-s.px + x), (-s.py + y), c)
+				fnPix((-s.py + x), (-s.px + y), c)
+			end
 
 			if s.m > 0 then
 				s.py = s.py - 1
@@ -69,10 +71,10 @@ function CreateCircle(x, y, r, c)
 			s.px = s.px + 1
 			s.m = s.m + 8 * s.px + 4
 
-			return true
+			return 8
 		end
 
-		return false
+		return 0
 	end
 
 	return circle
