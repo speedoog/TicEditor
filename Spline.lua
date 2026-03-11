@@ -27,7 +27,7 @@ function CreateSpline(c)
 			local x,y
 			for k,v in pairs(self.pts) do
 				if x~=nil then
-					t=t+distance(x,y,v[1],v[2])/100
+					t=t+1
 				end
 				table.insert(self.keys,t)
 				table.insert(self.keys,v[1])
