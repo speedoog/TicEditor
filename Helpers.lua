@@ -22,6 +22,10 @@ gKeyDown = 59
 gKeyLeft = 60
 gKeyRight= 61
 gKeyCtrl = 63
+gKeyZ = 26
+gKeyQ = 17
+gKeyS = 19
+gKeyD = 4
 
 function dump(o)
    if type(o) == 'table' then

@@ -93,6 +93,7 @@ end
 function Load(fileName)
 
 --	local filelist = ScanDir("*.txt")
+	trace("Loading "..fileName)
 
 	local scene={
 		filename=fileName,

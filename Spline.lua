@@ -50,13 +50,19 @@ function CreateSpline(c)
 		_.t = _.t+dt
 		_.i=_.i+1
 
-		if _.t <= _.tend then
+		if _.t > _.tend then
+			_.t=_.tend
+		end
+
+--		if _.t <= _.tend then
 			local v0 = CatmullRom(_.keys,2,tprev)
 			local v1 = CatmullRom(_.keys,2,_.t)
 			local iPix = 0
 			if fnPix ~= nil then
 				PlotLine(floor(v0[1]),floor(v0[2]),floor(v1[1]),floor(v1[2]),_.c,fnPix) -- c+2*(_.i&1)
 			end
+
+		if _.t < _.tend then
 			return 1
 		else
 			return 0
