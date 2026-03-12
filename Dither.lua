@@ -94,7 +94,7 @@ function ditherrect(x,y,w,h,fadeThickness,c1,c2)
 			else
 				t = (y2 / fadeThickness) * (matrixSize * matrixSize - 1)
 			end
-			
+
 			local color
 			if t < threshold then
 				color=c1

@@ -74,19 +74,22 @@ function ComputeTotalPix(scene)
 	end
 end
 
-function scandir()
+function ScanDir(filter)
+	if filter == nil then filter = "*" end
 	local filelist={}
-    local file = io.popen("dir *.txt /b")
-    for filename in file:lines() do
-		table.insert(filelist, filename)
-    end
-    file:close()
+	local file = io.popen("dir "..filter.." /b")
+	if file then
+		for filename in file:lines() do
+			table.insert(filelist, filename)
+		end
+		file:close()
+	end
     return filelist
 end
 
 function Load(fileName)
 
---	p=scandir()
+--	local filelist = ScanDir("*.txt")
 
 	local scene={
 		filename=fileName,
@@ -114,7 +117,7 @@ function Save(scene, fileName)
 		fileName=scene.filename
 	end
 	local f=io.open(fileName, "w")
-	if f~=nil then
+	if f then
 		for k, item in pairs(scene.items) do
 			local s=item:store()
 			f:write(item.type)
@@ -126,6 +129,6 @@ function Save(scene, fileName)
 			end
 			f:write("\n")
 		end
+		f:close()
 	end
-   f:close()
 end

@@ -52,46 +52,46 @@ function CreateEllipse(xm, ym, a, b, c)
 	end
 
 	function ellipse:Init()
-		s = self
-		s.x = -a
-		s.y = 0           				-- II. quadrant from bottom left to top right
-		s.a2=floor(a*a)
-		s.b2=floor(b*b)
-		s.e2 = s.b2
-		s.err = s.x*(2*s.e2+s.x)+s.e2;			-- error of 1.step
+		_ = self
+		_.x = -a
+		_.y = 0           				-- II. quadrant from bottom left to top right
+		_.a2=floor(a*a)
+		_.b2=floor(b*b)
+		_.e2 = _.b2
+		_.err = _.x*(2*_.e2+_.x)+_.e2;			-- error of 1.step
 	end
 
 	function ellipse:Draw(fnPix)
-		s = self
-		if s.x<=0 then
+		_ = self
+		if _.x<=0 then
 			if fnPix~=nil then
-				fnPix(xm-s.x, ym+s.y, c);
-				fnPix(xm+s.x, ym+s.y, c);
-				fnPix(xm+s.x, ym-s.y, c);
-				fnPix(xm-s.x, ym-s.y, c);
+				fnPix(xm-_.x, ym+_.y, c);
+				fnPix(xm+_.x, ym+_.y, c);
+				fnPix(xm+_.x, ym-_.y, c);
+				fnPix(xm-_.x, ym-_.y, c);
 			end
 
-			s.e2 = 2*s.err;
-			if (s.e2 >= (s.x*2+1)*s.b2) then		-- e_xy+e_x > 0
-				s.x=s.x+1
-				s.err = s.err+(s.x*2+1)*s.b2
+			_.e2 = 2*_.err;
+			if (_.e2 >= (_.x*2+1)*_.b2) then		-- e_xy+e_x > 0
+				_.x=_.x+1
+				_.err = _.err+(_.x*2+1)*_.b2
 			end
 
-			if (s.e2 <= (s.y*2+1)*s.a2) then		-- e_xy+e_y < 0
-				s.y=s.y+1
-				s.err = s.err+(s.y*2+1)*s.a2
+			if (_.e2 <= (_.y*2+1)*_.a2) then		-- e_xy+e_y < 0
+				_.y=_.y+1
+				_.err = _.err+(_.y*2+1)*_.a2
 			end
 
 			return 4
-		elseif s.y<b then
+		elseif _.y<b then
 			if fnPix~=nil then
-				fnPix(xm, ym+s.y,c)
-				fnPix(xm, ym-s.y,c)
+				fnPix(xm, ym+_.y,c)
+				fnPix(xm, ym-_.y,c)
 			end
-			S.y=s.y+1
+			_.y=_.y+1
 		end
 
-		if s.y>b then
+		if _.y>b then
 			return 2
 		end
 

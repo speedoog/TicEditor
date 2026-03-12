@@ -99,10 +99,10 @@ function CreatePolyLine(c)
 	local item =
 	{
 		nPix=0,
+		type="l",
 		c=c,
 		pts={},
 		i=1,
-		type="l",
 		store=function(self)
 			local s={}
 			table.insert(s, self.c)

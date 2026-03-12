@@ -1,7 +1,7 @@
 function PlotCircle(x, y, r, c)
-	px = 0
-	py = r
-	m = 5 - 4 * r
+	local px = 0
+	local py = r
+	local m = 5 - 4 * r
 
 	while (px <= py) do
 		pix((px + x), (py + y), c)
@@ -41,35 +41,35 @@ function CreateCircle(x, y, r, c)
 	end
 
 	function circle:Init()
-		s = self
-		s.x = x
-		s.y = y
-		s.px = 0
-		s.py = r
-		s.m = 5 - 4 * r
+		_ = self
+		_.x = x
+		_.y = y
+		_.px = 0
+		_.py = r
+		_.m = 5 - 4 * r
 	end
 
 	function circle:Draw(fnPix)
-		s = self
-		if (s.px <= s.py) then
+		_ = self
+		if (_.px <= _.py) then
 			if fnPix~=nil then
-				fnPix((s.px + x), (s.py + y), c)
-				fnPix((s.py + x), (s.px + y), c)
-				fnPix((-s.px + x), (s.py + y), c)
-				fnPix((-s.py + x), (s.px + y), c)
-				fnPix((s.px + x), (-s.py + y), c)
-				fnPix((s.py + x), (-s.px + y), c)
-				fnPix((-s.px + x), (-s.py + y), c)
-				fnPix((-s.py + x), (-s.px + y), c)
+				fnPix((_.px + x), (_.py + y), c)
+				fnPix((_.py + x), (_.px + y), c)
+				fnPix((-_.px + x), (_.py + y), c)
+				fnPix((-_.py + x), (_.px + y), c)
+				fnPix((_.px + x), (-_.py + y), c)
+				fnPix((_.py + x), (-_.px + y), c)
+				fnPix((-_.px + x), (-_.py + y), c)
+				fnPix((-_.py + x), (-_.px + y), c)
 			end
 
-			if s.m > 0 then
-				s.py = s.py - 1
-				s.m = s.m - 8 * s.py
+			if _.m > 0 then
+				_.py = _.py - 1
+				_.m = _.m - 8 * _.py
 			end
 
-			s.px = s.px + 1
-			s.m = s.m + 8 * s.px + 4
+			_.px = _.px + 1
+			_.m = _.m + 8 * _.px + 4
 
 			return 8
 		end

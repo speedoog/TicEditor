@@ -1,7 +1,7 @@
 require "Dither"
 
 function FillPix(x,y,c)
-	matrixSize = 8
+	local matrixSize = 8
 	local threshold = ditherMatrix8x8[x%matrixSize+1][y%matrixSize+1]
 
 	local h=136
@@ -18,7 +18,7 @@ end
 function FloodFill(x, y, c)
 	if not InScreen(x, y) then return end
 
-	loops = 0
+	local loops = 0
 
 	local o = pix(x, y)
 	local q = CreateQueue()
@@ -43,8 +43,8 @@ function FloodFill(x, y, c)
 			x = x + 1
 		end
 
-		scan(q, lx, x - 1, y + 1, o)
-		scan(q, lx, x - 1, y - 1, o)
+		HorizontalScan(q, lx, x - 1, y + 1, o)
+		HorizontalScan(q, lx, x - 1, y - 1, o)
 	end
 end
 
@@ -52,7 +52,7 @@ function InScreen(x, y) return x >= 0 and x < 240 and y >= 0 and y < 136 end
 
 function Inside(x, y, o) return pix(x, y) == o and InScreen(x, y) end
 
-function scan(q, lx, rx, y, o)
+function HorizontalScan(q, lx, rx, y, o)
 	local span_added = false
 	local x
 	for x = lx, rx do
@@ -118,8 +118,8 @@ function CreateFill(x,y,c)
 			x = x + 1
 		end
 
-		scan(q, lx, x - 1, y + 1, o)
-		scan(q, lx, x - 1, y - 1, o)
+		HorizontalScan(q, lx, x - 1, y + 1, o)
+		HorizontalScan(q, lx, x - 1, y - 1, o)
 
 		return q:isEmpty()==false
 	end
