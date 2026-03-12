@@ -3,6 +3,14 @@
         "pix",
         "rect",
         "trace",
-        "poke"
+        "poke",
+        "rectb",
+        "spr",
+        "circ",
+        "circb",
+        "vbank",
+        "cls",
+        "keyp",
+        "mouse"
     ]
 }

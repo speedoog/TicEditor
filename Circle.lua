@@ -40,8 +40,7 @@ function CreateCircle(x, y, r, c)
 		return "circle "..tostring(x).." "..tostring(y).." "..tostring(r).." "..tostring(c)
 	end
 
-	function circle:Init()
-		_ = self
+	function circle.Init(_)
 		_.x = x
 		_.y = y
 		_.px = 0
@@ -49,8 +48,7 @@ function CreateCircle(x, y, r, c)
 		_.m = 5 - 4 * r
 	end
 
-	function circle:Draw(fnPix)
-		_ = self
+	function circle.Draw(_,fnPix)
 		if (_.px <= _.py) then
 			if fnPix~=nil then
 				fnPix((_.px + x), (_.py + y), c)

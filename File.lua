@@ -56,6 +56,9 @@ end
 
 function AppendItem(scene, item, iPos)
 	if item~=nil then
+		if iPos==nil then
+			iPos=#scene.items+1
+		end
 		table.insert(scene.items, iPos, item)
 	end
 end

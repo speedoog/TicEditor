@@ -51,8 +51,7 @@ function CreateEllipse(xm, ym, a, b, c)
 		return "ellipse "..tostring(xm).." "..tostring(ym).." "..tostring(a).." "..tostring(b).." "..tostring(c)
 	end
 
-	function ellipse:Init()
-		_ = self
+	function ellipse.Init(_)
 		_.x = -a
 		_.y = 0           				-- II. quadrant from bottom left to top right
 		_.a2=floor(a*a)
@@ -61,8 +60,7 @@ function CreateEllipse(xm, ym, a, b, c)
 		_.err = _.x*(2*_.e2+_.x)+_.e2;			-- error of 1.step
 	end
 
-	function ellipse:Draw(fnPix)
-		_ = self
+	function ellipse.Draw(_,fnPix)
 		if _.x<=0 then
 			if fnPix~=nil then
 				fnPix(xm-_.x, ym+_.y, c);

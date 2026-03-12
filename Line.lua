@@ -56,38 +56,40 @@ function CreateLine(x0,y0,x1,y1,c)
 		return "line "..tostring(x0).." "..tostring(y0).." "..tostring(x1).." "..tostring(y1).." "..tostring(c)
 	end
 
-	function line:Init()
-		self.x = x0
-		self.y = y0
-		self.dx = abs(x1-x0)
-		self.dy =-abs(y1-y0)
+	function line.Init(_)
+		_.x = x0
+		_.y = y0
+		_.dx = abs(x1-x0)
+		_.dy =-abs(y1-y0)
 
 		if x0<x1 then line.sx=1 else line.sx=-1 end
 		if y0<y1 then line.sy=1 else line.sy=-1 end
 
-		self.err= self.dx+self.dy -- error value e_xy
-		self.e2 = self.err
+		_.err= _.dx+_.dy -- error value e_xy
+		_.e2 = _.err
 	end
 
 	-- return "continue"
-	function line:Draw(fnPix)
-		fnPix(self.x,self.y, c)
+	function line.Draw(_,fnPix)
+		if fnPix ~= nil then
+			fnPix(_.x,_.y, c)
+		end
 
-		if self.x==x1 and self.y==y1 then return false end
+		if _.x==x1 and _.y==y1 then return 0 end
 
-		self.e2 = 2*self.err
+		_.e2 = 2*_.err
 
-		if self.e2>=self.dy then -- e_xy+e_x > 0
-			self.err=self.err+self.dy
-			self.x =self.x+self.sx
+		if _.e2>=_.dy then -- e_xy+e_x > 0
+			_.err=_.err+_.dy
+			_.x =_.x+_.sx
 		end
 		
-		if self.e2<=self.dx then -- e_xy+e_y < 0
-			self.err=self.err+self.dx
-			self.y =self.y+self.sy
+		if _.e2<=_.dx then -- e_xy+e_y < 0
+			_.err=_.err+_.dx
+			_.y =_.y+_.sy
 		end
 
-		return true
+		return 1
 	end
 
 	return line
@@ -102,69 +104,72 @@ function CreatePolyLine(c)
 		type="l",
 		c=c,
 		pts={},
-		i=1,
-		store=function(self)
-			local s={}
-			table.insert(s, self.c)
-			for k,v in pairs(self.pts) do
-				table.insert(s, v[1])
-				table.insert(s, v[2])
-			end
-			return	s
-		end,
-		InitSeg=function(self, i)
-			self.i = i
-
-			if #self.pts<2 then return end
-
-			local p0=self.pts[i]
-			local p1=self.pts[i+1]
-			self.x  = p0[1]
-			self.y  = p0[2]
-			self.x1 = p1[1]
-			self.y1 = p1[2]
-			self.dx = abs(self.x1-self.x)
-			self.dy =-abs(self.y1-self.y)
-			
-			if self.x<self.x1 then self.sx=1 else self.sx=-1 end
-			if self.y<self.y1 then self.sy=1 else self.sy=-1 end
-			
-			self.err= self.dx+self.dy -- error value e_xy
-			self.e2 = self.err
-		end,
-		Init=function(self)
-			self:InitSeg(1)
-		end,
-
-		Draw=function(self, fnPix)
-			if fnPix ~= nil then
-				fnPix(self.x, self.y, self.c)
-			end
-
-			while self.x==self.x1 and self.y==self.y1 do	-- completed line ?
-				local i=self.i+1
-				if i>=#self.pts then
-					return 0					-- was last segment
-				else
-					self:InitSeg(i)				-- next segment
-				end
-			end
-
-			self.e2 = 2*self.err
-			
-			if self.e2>=self.dy then -- e_xy+e_x > 0
-				self.err=self.err+self.dy
-				self.x =self.x+self.sx
-			end
-			
-			if self.e2<=self.dx then -- e_xy+e_y < 0
-				self.err=self.err+self.dx
-				self.y =self.y+self.sy
-			end
-			
-			return 1
-		end
-		
+		i=1
 	}
+
+	function item.store(_)
+		local s={}
+		table.insert(s, _.c)
+		for k,v in pairs(_.pts) do
+			table.insert(s, v[1])
+			table.insert(s, v[2])
+		end
+		return	s
+	end
+
+	function item.InitSeg(_, i)
+		_.i = i
+
+		if #_.pts<2 then return end
+
+		local p0=_.pts[i]
+		local p1=_.pts[i+1]
+		_.x  = p0[1]
+		_.y  = p0[2]
+		_.x1 = p1[1]
+		_.y1 = p1[2]
+		_.dx = abs(_.x1-_.x)
+		_.dy =-abs(_.y1-_.y)
+
+		if _.x<_.x1 then _.sx=1 else _.sx=-1 end
+		if _.y<_.y1 then _.sy=1 else _.sy=-1 end
+
+		_.err= _.dx+_.dy -- error value e_xy
+		_.e2 = _.err
+	end
+
+	function item.Init(_)
+		_:InitSeg(1)
+	end
+
+	function item.Draw(_,fnPix)
+		if fnPix ~= nil then
+			fnPix(_.x, _.y, _.c)
+		end
+
+		while _.x==_.x1 and _.y==_.y1 do	-- completed line ?
+			local i=_.i+1
+			if i>=#_.pts then
+				return 0					-- was last segment
+			else
+				_:InitSeg(i)				-- next segment
+			end
+		end
+
+		_.e2 = 2*_.err
+
+		if _.e2>=_.dy then -- e_xy+e_x > 0
+			_.err=_.err+_.dy
+			_.x =_.x+_.sx
+		end
+
+		if _.e2<=_.dx then -- e_xy+e_y < 0
+			_.err=_.err+_.dx
+			_.y =_.y+_.sy
+		end
+
+		return 1
+	end
+
 	return item
 end

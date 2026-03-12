@@ -83,45 +83,52 @@ function CreateFill(x,y,c)
 		return "fill "..tostring(x).." "..tostring(y).." "..tostring(c)
 	end
 
-	function fill:Init()
+	function fill.Init(_)
 		if not InScreen(x, y) then return end
 
-		self.x = x
-		self.y = y
+		_.x = x
+		_.y = y
 
-		self.o = pix(x, y)
-		self.q = CreateQueue()
-		self.q:push({x, y})
+		_.o = pix(x, y)
+		_.q = CreateQueue()
+		_.q:push({x, y})
 	end
 
-	-- return "continue"
-	function fill:Draw(fnPix)
-		local q=self.q
+	function fill.Draw(_,fnPix)
+		local q=_.q
 
 		if q:isEmpty() then
-			return false
+			return 0
 		end
 
-		local o=self.o
+		local o=_.o
 		local v = q:pop()
 		local x = v[1]
 		local y = v[2]
 		local lx = x
 
 		while Inside(lx - 1, y, o) do
-			fnPix(lx - 1, y, c)
+			if fnPix ~= nil then
+				fnPix(lx-1,y,c)
+			end
 			lx = lx - 1
 		end
 
 		while Inside(x, y, o) do
-			fnPix(x, y, c)
+			if fnPix ~= nil then
+				fnPix(x, y, c)
+			end
 			x = x + 1
 		end
 
 		HorizontalScan(q, lx, x - 1, y + 1, o)
 		HorizontalScan(q, lx, x - 1, y - 1, o)
 
-		return q:isEmpty()==false
+		if q:isEmpty() then
+			return 1
+		else
+			return 0
+		end
 	end
 
 	return fill

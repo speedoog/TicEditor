@@ -7,31 +7,31 @@ function CreateQueue()
 		return setmetatable({},queue)
 	end
 
-	function queue:push(item)
-		if self._has[item] then return end
-		self._pointer = self._pointer+1
-		self._queue[self._pointer] = item
-		self._has[item] = true
-		return self
+	function queue.push(_,item)
+		if _._has[item] then return end
+		_._pointer = _._pointer+1
+		_._queue[_._pointer] = item
+		_._has[item] = true
+		return _
 	end
 
-	function queue:pop()
-		local item = self._queue[1]
-		self._pointer = self._pointer-1
-		table.remove(self._queue,1)
-		self._has[item] = nil
+	function queue.pop(_)
+		local item = _._queue[1]
+		_._pointer = _._pointer-1
+		table.remove(_._queue,1)
+		_._has[item] = nil
 		return item
 	end
 
-	function queue:isEmpty()
-		return (self._pointer == 0)
+	function queue.isEmpty(_)
+		return (_._pointer == 0)
 	end
 
-	function queue:clear()
-		self._queue = {}
-		self._has = {}
-		self._pointer = 0
-		return self
+	function queue.clear(_)
+		_._queue = {}
+		_._has = {}
+		_._pointer = 0
+		return _
 	end
 
 	return queue

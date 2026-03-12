@@ -20,6 +20,7 @@ end
 
 require "Maths"
 require "Helpers"
+require "Fs"
 require "Queue"
 require "File"
 require "Line"
