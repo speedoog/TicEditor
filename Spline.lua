@@ -1,17 +1,9 @@
-function CreateSpline(c)
-	if c == nil then c = 10 end
 
-	local item =
-	{
-		nPix = 0,
-		c = c,
-		pts = {},
-		type = "s",
-		t = 0,
-		i = 0,
-		tend = 0,
-		keys = {},
-	}
+function CreateSpline(item)
+	item.t = 0
+	item.i = 0
+	item.tend = 0
+	item.keys = {}
 
 	function item.Load(_,p)
 		_.c = p[1]

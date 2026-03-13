@@ -77,13 +77,13 @@ end
 function CreateFill(x,y,c)
 	if c==nil then c=10 end
 
-	local fill = { }
+	local item = { }
 
-	function fill:str()
+	function item:str()
 		return "fill "..tostring(x).." "..tostring(y).." "..tostring(c)
 	end
 
-	function fill.Init(_)
+	function item.Init(_)
 		if not InScreen(x, y) then return end
 
 		_.x = x
@@ -94,7 +94,7 @@ function CreateFill(x,y,c)
 		_.q:push({x, y})
 	end
 
-	function fill.Draw(_,fnPix)
+	function item.Draw(_,fnPix)
 		local q=_.q
 
 		if q:isEmpty() then
@@ -131,5 +131,5 @@ function CreateFill(x,y,c)
 		end
 	end
 
-	return fill
+	return item
 end

@@ -54,4 +54,30 @@ function DrawCrosshair(mx, my)
 	PlotLine(mx, my+min, mx, my+max, color)
 end
 
+function Split(inputstr,sep)
+   if sep == nil then
+      sep = "%s"
+   end
+   local t = {}
+   for str in string.gmatch(inputstr,"([^"..sep.."]+)") do
+      local num = tonumber(str)
+      if num == nil then
+         table.insert(t,str)
+      else
+         table.insert(t,num)
+      end
+   end
+   return t
+end
 
+function FillString(array)
+   local s = ""
+   for k,l in pairs(array) do
+      s = s..tostring(l).." "
+   end
+   return s
+end
+
+function IsEmpty(s)
+   return s == nil or s == ''
+end

@@ -133,11 +133,11 @@ function UI.DrawTools(_)
 	_.btny = 10
 	local prevTool=_.tool
 	_:ButtonTool(256,"line")
+	_:ButtonTool(259,"spline")
 	_:ButtonTool(257,"circle")
 	_:ButtonTool(258,"ellipse")
-	_:ButtonTool(259,"spline")
 	_:ButtonTool(260,"fill")
-	_:ButtonTool(267,"speed")
+--	_:ButtonTool(267,"speed")
 	_:ButtonTool(264,"edit")
 	if _:ButtonTool(268,"trash") then
 		table.remove(scene.items, _.iCurItem)
@@ -238,11 +238,22 @@ function UI.Draw(_)
 	local item = scene.items[_.iCurItem]
 	if item then
 		local pt = item.pts[_.iCurPt]
+		local edit
 		if pt then
-			if keyp(gKeyQ,20,1) then pt[1]=pt[1]-1 end
-			if keyp(gKeyD,20,1) then pt[1]=pt[1]+1 end
-			if keyp(gKeyZ,20,1) then pt[2]=pt[2]-1 end
-			if keyp(gKeyS,20,1) then pt[2]=pt[2]+1 end
+			if keyp(gKeyQ,20,1) then pt[1]=pt[1]-1 edit=true end
+			if keyp(gKeyD,20,1) then pt[1]=pt[1]+1 edit=true end
+			if keyp(gKeyZ,20,1) then pt[2]=pt[2]-1 edit=true end
+			if keyp(gKeyS,20,1) then pt[2]=pt[2]+1 edit=true end
+
+			if _.tool=="edit" then
+				pt[1] = _.mx
+				pt[2] = _.my
+			end
+
+			if edit then
+				ComputeTotalPix(scene)
+				_:SyncPixTarget()
+			end
 
 			DrawCrosshair(pt[1],pt[2])
 		end
@@ -316,12 +327,13 @@ function UI.UpdateItemEditor(_)
 	if dml then
 		if not _.btrace then									-- 1st click
 			if _.tool=="line" then
-				item = CreatePolyLine(_.color1)
+				item = CreateItem("l")
 			elseif _.tool=="spline" then
-				item = CreateSpline(_.color1)
+				item = CreateItem("s")
 			end
 
 			if item then									-- item valid, continue init
+				item.c = _.color1
 				_.btrace = true
 				table.insert(item.pts, {mx,my})
 				table.insert(item.pts, {mx,my})
@@ -430,17 +442,12 @@ end
 function UI.Init(_)
 
 	HideCursor()
-	FS_Load(FS)
 
-	-- init mouse
---	_.mx,_.my,_.ml,_.mm,_.mr = mouse()
-
---  	scene = Load("Spectrals.txt")
 	scene = Load("test.txt")
 	_.iPixTarget = scene.nPix
 	_:SetCurrentItem(#scene.items)	-- seek to last
 
-
+--	FS_Load(FS)
 --	scene = FS_LoadScene("test.txt")
 --	Save(scene, "abc.txt")
 
@@ -467,7 +474,6 @@ function UI.Update(_)
 	_:DrawItems()
 
 	_:Draw()
-
 
 end
 

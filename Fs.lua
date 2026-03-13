@@ -1,3 +1,6 @@
+
+--[[
+
 FS = {}
 
 function FS_Load(FS)
@@ -82,3 +85,4 @@ function FS_LoadScene(file)
     ComputeTotalPix(scene)
     return scene
 end
+]]

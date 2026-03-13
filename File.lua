@@ -1,41 +1,33 @@
 
-function Split(inputstr, sep)
-	if sep == nil then
-		sep = "%s"
-	end
-	local t = {}
-	for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
-		local num=tonumber(str)
-		if num==nil then 
-			table.insert(t, str)
-		else
-			table.insert(t, num)
-		end
-	end
-	return t
+
+function CreateItemBase(t,c)
+	return {nPix = 0,type = t,c=c, pts = {}}
 end
 
-function FillString(array)
-	local s=""
-	for k, l in pairs(array) do
-		s = s..tostring(l).." "
+function CreateItem(cmd)
+	if gItemFactory==nil then
+		gItemFactory = {
+			["l"] = CreatePolyLine,
+			-- ["e"] = true,
+			-- ["c"] = true,
+			-- ["f"] = true,
+			["s"] = CreateSpline,
+		}
 	end
-	return s
-end
-
-function IsEmpty(s)
-	return s == nil or s == ''
-end
-
-function CreateItem(l,Factory)
 	local item
+	local fnCreate = gItemFactory[cmd]
+	if fnCreate then
+		item = CreateItemBase(cmd)
+		fnCreate(item)
+	end
+	return item
+end
 
+function LoadItem(l,Factory)
 	local p=Split(l)
 	local cmd = p[1]
-	local fnCreate=Factory[cmd]
-	if fnCreate then
-		item = fnCreate()
-	end
+
+	local item = CreateItem(cmd)
 
 	if item then
 		table.remove(p,1)	-- cmd
@@ -82,6 +74,7 @@ function ScanDir(filter)
     return filelist
 end
 
+
 function Load(fileName)
 
 --	local filelist = ScanDir("*.txt")
@@ -93,13 +86,6 @@ function Load(fileName)
 		items={},
 	}
 
-	local Factory = {
-		["l"] = CreatePolyLine,
-		-- ["e"] = true,
-		-- ["c"] = true,
-		-- ["f"] = true,
-		["s"] = CreateSpline,
-	}
 
 	local f=io.open(fileName, "r")
 	if f~=nil then
@@ -107,7 +93,7 @@ function Load(fileName)
 		while(true) do
 			local s=f:read()
 			if s==nil then break end
-			local item = CreateItem(s,Factory)
+			local item = LoadItem(s,Factory)
 			AppendItem(scene, item, #scene.items+1)
 		end
 		io.close(f)

@@ -1,12 +1,4 @@
 
-function PixPatch(x,y,c)
-	pix(x,y, c+1)
-	pix(x-1,y+1, c)
-	pix(x+1,y-1, c)
-	pix(x-1,y+1, c)
-	pix(x+1,y+1, c)
-end
-
 function PlotLine(x0,y0,x1,y1,c,fn)
 	if fn==nil then fn=pix end
 
@@ -39,72 +31,8 @@ function PlotLine(x0,y0,x1,y1,c,fn)
 	return iPix
 end
 
-function CreateLineMem(ptr)
-	local p,item
-	ptr,p=Pop(ptr,5)
-	item=CreateLine(p[1],p[2],p[3],p[4],p[5])
-	return ptr,item
-end
-
-function CreateLine(x0,y0,x1,y1,c)
-	if c==nil then c=10 end
-
-	local line = { }
-
-	function line:str()
-		return "line "..tostring(x0).." "..tostring(y0).." "..tostring(x1).." "..tostring(y1).." "..tostring(c)
-	end
-
-	function line.Init(_)
-		_.x = x0
-		_.y = y0
-		_.dx = abs(x1-x0)
-		_.dy =-abs(y1-y0)
-
-		if x0<x1 then line.sx=1 else line.sx=-1 end
-		if y0<y1 then line.sy=1 else line.sy=-1 end
-
-		_.err= _.dx+_.dy -- error value e_xy
-		_.e2 = _.err
-	end
-
-	-- return "continue"
-	function line.Draw(_,fnPix)
-		if fnPix ~= nil then
-			fnPix(_.x,_.y, c)
-		end
-
-		if _.x==x1 and _.y==y1 then return 0 end
-
-		_.e2 = 2*_.err
-
-		if _.e2>=_.dy then -- e_xy+e_x > 0
-			_.err=_.err+_.dy
-			_.x =_.x+_.sx
-		end
-		
-		if _.e2<=_.dx then -- e_xy+e_y < 0
-			_.err=_.err+_.dx
-			_.y =_.y+_.sy
-		end
-
-		return 1
-	end
-
-	return line
-end
-
-function CreatePolyLine(c)
-	if c==nil then c=10 end
-
-	local item =
-	{
-		nPix=0,
-		type="l",
-		c=c,
-		pts={},
-		i=1
-	}
+function CreatePolyLine(item)
+	item.i=1
 
 	function item.Load(_,p)
 		_.c=p[1]
@@ -180,3 +108,56 @@ function CreatePolyLine(c)
 
 	return item
 end
+
+
+--[[
+
+function CreateLine(x0,y0,x1,y1,c)
+	if c==nil then c=10 end
+
+	local line = { }
+
+	function line:str()
+		return "line "..tostring(x0).." "..tostring(y0).." "..tostring(x1).." "..tostring(y1).." "..tostring(c)
+	end
+
+	function line.Init(_)
+		_.x = x0
+		_.y = y0
+		_.dx = abs(x1-x0)
+		_.dy =-abs(y1-y0)
+
+		if x0<x1 then line.sx=1 else line.sx=-1 end
+		if y0<y1 then line.sy=1 else line.sy=-1 end
+
+		_.err= _.dx+_.dy -- error value e_xy
+		_.e2 = _.err
+	end
+
+	-- return "continue"
+	function line.Draw(_,fnPix)
+		if fnPix ~= nil then
+			fnPix(_.x,_.y, c)
+		end
+
+		if _.x==x1 and _.y==y1 then return 0 end
+
+		_.e2 = 2*_.err
+
+		if _.e2>=_.dy then -- e_xy+e_x > 0
+			_.err=_.err+_.dy
+			_.x =_.x+_.sx
+		end
+		
+		if _.e2<=_.dx then -- e_xy+e_y < 0
+			_.err=_.err+_.dx
+			_.y =_.y+_.sy
+		end
+
+		return 1
+	end
+
+	return line
+end
+
+]]--
