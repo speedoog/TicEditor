@@ -18,13 +18,11 @@ if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
   	require("lldebugger").start()
 end
 
-require "Maths"
 require "Helpers"
-require "Fs"
+require "Maths"
+require "DrawCommon"
 require "Queue"
 require "File"
-require "Line"
-require "Spline"
 require "Circle"
 require "Ellipse"
 require "Fill"

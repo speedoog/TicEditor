@@ -1,5 +1,6 @@
 require "Dither"
 
+--[[
 function FillPix(x,y,c)
 	local matrixSize = 8
 	local threshold = ditherMatrix8x8[x%matrixSize+1][y%matrixSize+1]
@@ -15,17 +16,17 @@ function FillPix(x,y,c)
 	end
 end
 
-function FloodFill(x, y, c)
+function FloodFill(x, y, c, nLoops)
 	if not InScreen(x, y) then return end
 
-	local loops = 0
+	local i = 0
 
 	local o = pix(x, y)
 	local q = CreateQueue()
 	q:push({x, y})
 	while q:isEmpty() == false do
-		loops = loops + 1
-		if loops / 2 > t then return end
+		i = i + 1
+		if i > nLoops then return end
 
 		local v = q:pop()
 		x = v[1]
@@ -47,10 +48,15 @@ function FloodFill(x, y, c)
 		HorizontalScan(q, lx, x - 1, y - 1, o)
 	end
 end
+]]--
 
-function InScreen(x, y) return x >= 0 and x < 240 and y >= 0 and y < 136 end
+function InScreen(x, y)
+	return x>=0 and x<gSizeX and y>=0 and y<gSizeY
+end
 
-function Inside(x, y, o) return pix(x, y) == o and InScreen(x, y) end
+function Inside(x, y, o)
+	return pix(x,y)==o and InScreen(x, y)
+end
 
 function HorizontalScan(q, lx, rx, y, o)
 	local span_added = false
@@ -64,15 +70,6 @@ function HorizontalScan(q, lx, rx, y, o)
 		end
 	end
 end
-
-
-function CreateFillMem(ptr)
-	local p,item
-	ptr,p=Pop(ptr,3)
-	item=CreateFill(p[1],p[2],p[3])
-	return ptr,item
-end
-
 
 function CreateFill(x,y,c)
 	if c==nil then c=10 end

@@ -1,6 +1,10 @@
 sqrt,abs,sin,cos,tan,pi,min,max,floor=math.sqrt,math.abs,math.sin,math.cos,math.tan,math.pi,math.min,math.max,math.floor
 rand,seed=math.random,math.randomseed
 
+function round(a)
+	return floor(a+0.5)
+end
+
 function remap( x, t1, t2, s1, s2 )
  local f = ( x - t1 ) / ( t2 - t1 )
  return f * ( s2 - s1 ) + s1

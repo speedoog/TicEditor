@@ -1,29 +1,7 @@
 
 
-function CreateItemBase(t,c)
-	return {nPix = 0,type = t,c=c, pts = {}}
-end
 
-function CreateItem(cmd)
-	if gItemFactory==nil then
-		gItemFactory = {
-			["l"] = CreatePolyLine,
-			-- ["e"] = true,
-			-- ["c"] = true,
-			-- ["f"] = true,
-			["s"] = CreateSpline,
-		}
-	end
-	local item
-	local fnCreate = gItemFactory[cmd]
-	if fnCreate then
-		item = CreateItemBase(cmd)
-		fnCreate(item)
-	end
-	return item
-end
-
-function LoadItem(l,Factory)
+function LoadItem(l)
 	local p=Split(l)
 	local cmd = p[1]
 
@@ -93,7 +71,7 @@ function Load(fileName)
 		while(true) do
 			local s=f:read()
 			if s==nil then break end
-			local item = LoadItem(s,Factory)
+			local item = LoadItem(s)
 			AppendItem(scene, item, #scene.items+1)
 		end
 		io.close(f)

@@ -447,10 +447,6 @@ function UI.Init(_)
 	_.iPixTarget = scene.nPix
 	_:SetCurrentItem(#scene.items)	-- seek to last
 
---	FS_Load(FS)
---	scene = FS_LoadScene("test.txt")
---	Save(scene, "abc.txt")
-
 	UI:Draw()
 end
 
