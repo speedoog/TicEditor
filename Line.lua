@@ -30,7 +30,6 @@ function PlotLine(x0,y0,x1,y1,c,fn)
 			err=err+dy
 			x0 =x0+sx
 		end
-		
 		if e2<=dx then -- e_xy+e_y < 0
 			if y0==y1 then b=false end
 			err=err+dx
@@ -107,7 +106,15 @@ function CreatePolyLine(c)
 		i=1
 	}
 
-	function item.store(_)
+	function item.Load(_,p)
+		_.c=p[1]
+		local ptcount = (#p-1)>>1
+		for i = 1,ptcount do
+			_.pts[i] = {p[i*2],p[1+i*2]}
+		end
+	end
+
+	function item.Save(_)
 		local s={}
 		table.insert(s, _.c)
 		for k,v in pairs(_.pts) do

@@ -27,28 +27,20 @@ function IsEmpty(s)
 	return s == nil or s == ''
 end
 
-function CreateItem(l)
-	local p=Split(l)
+function CreateItem(l,Factory)
 	local item
-	local len=p[2]
-	if p[1]=="l" then
-		item=CreatePolyLine(p[3])
-		local ptcount=(len-1)>>1
-		for i=1,ptcount do
-			item.pts[i]={p[2+i*2], p[3+i*2]}
-		end
-	elseif p[1]=="s" then
-		item=CreateSpline(p[3])
-		local ptcount=(len-1)>>1
-		for i=1,ptcount do
-			item.pts[i]={p[2+i*2], p[3+i*2]}
-		end
-	elseif p[1]=="circle" then
-		item=CreateCircle(p[2],p[3],p[4],p[5])
-	elseif p[1]=="fill" then
-		item=CreateFill(p[2],p[3],p[4])
-	elseif p[1]=="ellipse" then
-		item=CreateEllipse(p[2],p[3],p[4],p[5],p[6])
+
+	local p=Split(l)
+	local cmd = p[1]
+	local fnCreate=Factory[cmd]
+	if fnCreate then
+		item = fnCreate()
+	end
+
+	if item then
+		table.remove(p,1)	-- cmd
+		table.remove(p,1)	-- size
+		item:Load(p)
 	end
 
 	return item
@@ -101,13 +93,21 @@ function Load(fileName)
 		items={},
 	}
 
+	local Factory = {
+		["l"] = CreatePolyLine,
+		-- ["e"] = true,
+		-- ["c"] = true,
+		-- ["f"] = true,
+		["s"] = CreateSpline,
+	}
+
 	local f=io.open(fileName, "r")
 	if f~=nil then
 
 		while(true) do
 			local s=f:read()
 			if s==nil then break end
-			local item =CreateItem(s)
+			local item = CreateItem(s,Factory)
 			AppendItem(scene, item, #scene.items+1)
 		end
 		io.close(f)
@@ -123,7 +123,7 @@ function Save(scene, fileName)
 	local f=io.open(fileName, "w")
 	if f then
 		for k, item in pairs(scene.items) do
-			local s=item:store()
+			local s=item:Save()
 			f:write(item.type)
 			f:write(" ")
 			f:write(#s)

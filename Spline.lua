@@ -13,7 +13,15 @@ function CreateSpline(c)
 		keys = {},
 	}
 
-	function item.store(_)
+	function item.Load(_,p)
+		_.c = p[1]
+		local ptcount = (#p-1)>>1
+		for i = 1,ptcount do
+			_.pts[i] = {p[i*2],p[1+i*2]}
+		end
+	end
+
+	function item.Save(_)
 		local s = {}
 		table.insert(s,_.c)
 		for k,v in pairs(_.pts) do
@@ -54,13 +62,12 @@ function CreateSpline(c)
 			_.t=_.tend
 		end
 
---		if _.t <= _.tend then
-			local v0 = CatmullRom(_.keys,2,tprev)
-			local v1 = CatmullRom(_.keys,2,_.t)
-			local iPix = 0
-			if fnPix ~= nil then
-				PlotLine(floor(v0[1]),floor(v0[2]),floor(v1[1]),floor(v1[2]),_.c,fnPix) -- c+2*(_.i&1)
-			end
+		local v0 = CatmullRom(_.keys,2,tprev)
+		local v1 = CatmullRom(_.keys,2,_.t)
+		local iPix = 0
+		if fnPix ~= nil then
+			PlotLine(floor(v0[1]),floor(v0[2]),floor(v1[1]),floor(v1[2]),_.c,fnPix) -- c+2*(_.i&1)
+		end
 
 		if _.t < _.tend then
 			return 1
