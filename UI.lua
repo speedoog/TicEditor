@@ -262,22 +262,28 @@ function UI.Draw(_)
 
 end
 
+function UI.MoveAll(_,x,y)
+	for ki,vi in pairs(scene.items) do
+		for kp,vp in pairs(vi.pts) do
+			vp[1] = vp[1]+x
+			vp[1] = vp[1]+y
+		end
+	end
+end
+
 function UI.DrawEditor(_)
 	vbank(1)
 
-	if keyp(gKeyRight,20,1) then
-		_:SetCurrentItem(_.iCurItem+1)
-	end
-	if keyp(gKeyLeft,20,1) then
-		_:SetCurrentItem(_.iCurItem-1)
-	end
-
-	if keyp(gKeyUp,20,1) then
-		_:SetCurrentPoint(_.iCurPt+1)
-	end
-
-	if keyp(gKeyDown,20,1) then
-		_:SetCurrentPoint(_.iCurPt-1)
+	if key(gKeyCtrl) then
+		if keyp(gKeyRight,20,1) then _:MoveAll(1,0)		end
+		if keyp(gKeyLeft,20,1) 	then _:MoveAll(-1,0)	end
+		if keyp(gKeyUp,20,1) 	then _:MoveAll(0,-1)	end
+		if keyp(gKeyDown,20,1) 	then _:MoveAll(0,1)		end
+	else
+		if keyp(gKeyRight,20,1) then _:SetCurrentItem(_.iCurItem+1) end
+		if keyp(gKeyLeft,20,1) 	then _:SetCurrentItem(_.iCurItem-1) end
+		if keyp(gKeyUp,20,1) 	then _:SetCurrentPoint(_.iCurPt+1) end
+		if keyp(gKeyDown,20,1) 	then _:SetCurrentPoint(_.iCurPt-1) end
 	end
 
 	if _:ButtonIcon(0,gSizeY-_.btnSize,_.btnSize,_.btnSize,gBlack,289,"editor") then
@@ -328,18 +334,27 @@ function UI.UpdateItemEditor(_)
 		if not _.btrace then									-- 1st click
 			if _.tool=="line" then
 				item = CreateItem("l")
-			elseif _.tool=="spline" then
+			elseif _.tool == "spline" then
 				item = CreateItem("s")
+			elseif _.tool == "fill" then
+				item = CreateItem("f")
 			end
 
 			if item then									-- item valid, continue init
 				item.c = _.color1
 				_.btrace = true
-				table.insert(item.pts, {mx,my})
-				table.insert(item.pts, {mx,my})
 				AppendItem(scene,item, _.iCurItem+1)
+				table.insert(item.pts, {mx,my})
+
+				if item.maxpt==1 then
+					_.btrace = false
+				else
+					table.insert(item.pts, {mx,my})
+				end
+
 				ComputeTotalPix(scene)
 				_:SetCurrentItem(_.iCurItem+1)
+				_:SyncPixTarget()
 			end
 		else												-- New click
 			item = scene.items[_.iCurItem]
@@ -443,11 +458,9 @@ function UI.Init(_)
 
 	HideCursor()
 
-	scene = Load("test.txt")
+	scene = Load("spectrals.txt")
 	_.iPixTarget = scene.nPix
 	_:SetCurrentItem(#scene.items)	-- seek to last
-
-	UI:Draw()
 end
 
 function UI.Update(_)

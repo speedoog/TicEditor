@@ -1,6 +1,4 @@
 
-
-
 function LoadItem(l)
 	local p=Split(l)
 	local cmd = p[1]
@@ -26,48 +24,29 @@ function AppendItem(scene, item, iPos)
 end
 
 function ComputeTotalPix(scene)
+	vbank(0)
+	cls()
 	scene.nPix = 0
 	for k, item in pairs(scene.items) do
 		item:Init()
 		item.nPix = 0
 		local iPix = 1
 		while iPix > 0 do
-			iPix = item:Draw()
+			iPix = item:Draw(pix)
 			item.nPix = item.nPix + iPix
 		end
 		scene.nPix = scene.nPix + item.nPix
 	end
 end
 
-function ScanDir(filter)
-	if filter == nil then filter = "*" end
-	local filelist={}
-	local file = io.popen("dir "..filter.." /b")
-	if file then
-		for filename in file:lines() do
-			table.insert(filelist, filename)
-		end
-		file:close()
-	end
-    return filelist
-end
-
-
 function Load(fileName)
 
---	local filelist = ScanDir("*.txt")
 	trace("Loading "..fileName)
 
-	local scene={
-		filename=fileName,
-		nPix=0,
-		items={},
-	}
-
+	local scene={ filename=fileName, nPix=0, items={} }
 
 	local f=io.open(fileName, "r")
-	if f~=nil then
-
+	if f then
 		while(true) do
 			local s=f:read()
 			if s==nil then break end
@@ -99,4 +78,18 @@ function Save(scene, fileName)
 		end
 		f:close()
 	end
+end
+
+--	local filelist = ScanDir("*.txt")
+function ScanDir(filter)
+	if filter == nil then filter = "*" end
+	local filelist = {}
+	local file = io.popen("dir "..filter.." /b")
+	if file then
+		for filename in file:lines() do
+			table.insert(filelist,filename)
+		end
+		file:close()
+	end
+	return filelist
 end

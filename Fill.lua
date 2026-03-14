@@ -50,83 +50,64 @@ function FloodFill(x, y, c, nLoops)
 end
 ]]--
 
-function InScreen(x, y)
-	return x>=0 and x<gSizeX and y>=0 and y<gSizeY
-end
 
-function Inside(x, y, o)
-	return pix(x,y)==o and InScreen(x, y)
-end
 
-function HorizontalScan(q, lx, rx, y, o)
-	local span_added = false
-	local x
-	for x = lx, rx do
-		if Inside(x, y, o) == false then
-			span_added = false
-		elseif not span_added then
-			q:push({x, y})
-			span_added = true
-		end
-	end
-end
+-- function CreateFill(x,y,c)
+-- 	if c==nil then c=10 end
 
-function CreateFill(x,y,c)
-	if c==nil then c=10 end
+-- 	local item = { }
 
-	local item = { }
+-- 	function item:str()
+-- 		return "fill "..tostring(x).." "..tostring(y).." "..tostring(c)
+-- 	end
 
-	function item:str()
-		return "fill "..tostring(x).." "..tostring(y).." "..tostring(c)
-	end
+-- 	function item.Init(_)
+-- 		if not InScreen(x, y) then return end
 
-	function item.Init(_)
-		if not InScreen(x, y) then return end
+-- 		_.x = x
+-- 		_.y = y
 
-		_.x = x
-		_.y = y
+-- 		_.o = pix(x, y)
+-- 		_.q = CreateQueue()
+-- 		_.q:push({x, y})
+-- 	end
 
-		_.o = pix(x, y)
-		_.q = CreateQueue()
-		_.q:push({x, y})
-	end
+-- 	function item.Draw(_,fnPix)
+-- 		local q=_.q
 
-	function item.Draw(_,fnPix)
-		local q=_.q
+-- 		if q:isEmpty() then
+-- 			return 0
+-- 		end
 
-		if q:isEmpty() then
-			return 0
-		end
+-- 		local o=_.o
+-- 		local v = q:pop()
+-- 		local x = v[1]
+-- 		local y = v[2]
+-- 		local lx = x
 
-		local o=_.o
-		local v = q:pop()
-		local x = v[1]
-		local y = v[2]
-		local lx = x
+-- 		while Inside(lx - 1, y, o) do
+-- 			if fnPix ~= nil then
+-- 				fnPix(lx-1,y,c)
+-- 			end
+-- 			lx = lx - 1
+-- 		end
 
-		while Inside(lx - 1, y, o) do
-			if fnPix ~= nil then
-				fnPix(lx-1,y,c)
-			end
-			lx = lx - 1
-		end
+-- 		while Inside(x, y, o) do
+-- 			if fnPix ~= nil then
+-- 				fnPix(x, y, c)
+-- 			end
+-- 			x = x + 1
+-- 		end
 
-		while Inside(x, y, o) do
-			if fnPix ~= nil then
-				fnPix(x, y, c)
-			end
-			x = x + 1
-		end
+-- 		HorizontalScan(q, lx, x - 1, y + 1, o)
+-- 		HorizontalScan(q, lx, x - 1, y - 1, o)
 
-		HorizontalScan(q, lx, x - 1, y + 1, o)
-		HorizontalScan(q, lx, x - 1, y - 1, o)
+-- 		if q:isEmpty() then
+-- 			return 1
+-- 		else
+-- 			return 0
+-- 		end
+-- 	end
 
-		if q:isEmpty() then
-			return 1
-		else
-			return 0
-		end
-	end
-
-	return item
-end
+-- 	return item
+-- end
