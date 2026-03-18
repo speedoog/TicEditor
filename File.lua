@@ -33,7 +33,7 @@ function ComputeTotalPix(scene)
 		local iPix = 1
 		while iPix > 0 do
 			iPix = item:Draw(pix)
-			item.nPix = item.nPix + iPix
+			item.nPix = item.nPix + 1
 		end
 		scene.nPix = scene.nPix + item.nPix
 	end

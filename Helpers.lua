@@ -16,6 +16,7 @@ gAddMap = 0x8000
 -- keys (https://skyelynwaddell.github.io/tic80-manual-cheatsheet/)
 gKeySpace = 48
 gKeyTab = 49
+gKeyDel = 52
 gKeyUp = 58
 gKeyDown = 59
 gKeyLeft = 60

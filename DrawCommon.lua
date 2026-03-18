@@ -107,7 +107,7 @@ function CreatePolyLine(item)
 		while _.x == _.x1 and _.y == _.y1 do -- completed line ?
 			local i = _.i+1
 			if i >= #_.pts then
-				return 0     -- was last segment
+				return 0 -- was last segment
 			else
 				_:InitSeg(i) -- next segment
 			end
@@ -136,6 +136,7 @@ function CreateSpline(item)
 	item.i = 0
 	item.tend = 0
 	item.keys = {}
+	item.div = 3
 
 	function item.Load(_,p)
 		_.c = p[1]
@@ -161,11 +162,14 @@ function CreateSpline(item)
 		_.keys = {} -- build up CatmullRom keys
 		local t = 0
 		local x1,y1,x2,y2
+		local div = _.div
 		for k,v in pairs(_.pts) do
 			x2 = v[1]
 			y2 = v[2]
 			if x1 ~= nil then
-				t = t+distance(x1,y1,x2,y2)
+				local d = distance(x1,y1,x2,y2)
+				d = floor(d/div+1)*div
+				t = t+d
 			end
 			table.insert(_.keys,t)
 			table.insert(_.keys,x2)
@@ -177,10 +181,8 @@ function CreateSpline(item)
 	end
 
 	function item.Draw(_,fnPix)
-		local dt = 3
 		local tprev = _.t
-		_.t = _.t+dt
-		_.i = _.i+1
+		_.t = _.t+_.div
 
 		if _.t > _.tend then
 			_.t = _.tend
@@ -190,9 +192,11 @@ function CreateSpline(item)
 		local v1 = CatmullRom(_.keys,2,_.t)
 		local iPix = 0
 		if fnPix ~= nil then
-			PlotLine(round(v0[1]),round(v0[2]),round(v1[1]),round(v1[2]),_.c,fnPix) -- c+2*(_.i&1)
+			PlotLine(round(v0[1]),round(v0[2]),round(v1[1]),round(v1[2]),_.c,fnPix)
+			--			PlotLine(round(v0[1]),round(v0[2]),round(v1[1]),round(v1[2]),_.c+2*(_.i&1),fnPix)
 		end
 
+		_.i = _.i+1
 		if _.t < _.tend then
 			return 1
 		else
@@ -262,19 +266,41 @@ function HorizontalScan(q,lx,rx,y,o)
 	end
 end
 
+function ComputeProjRatio(a,b,p)
+	local vAP = V2Sub(p,a)
+	local vAB = V2Sub(b,a)
+
+	--	local dist=0
+	local rProjRatio = 0
+	local sqrLength = V2SqLength(vAB)
+
+	if sqrLength == 0 then
+		--		dist = V2SqLength(vAP);
+	else
+		local rDot = V2Dot(vAP,vAB);
+		rProjRatio = rDot/sqrLength;
+		--		rProjRatio = clamp(rProjRatio, 0, 1)
+		--		dist = rProjRatio * sqrt(sqrLength);
+	end
+
+	return rProjRatio;
+end
+
 function CreateFill(item)
-	item.maxpt=1
+	item.maxpt = 2
 	function item.Load(_,p)
 		_.c = p[1]
-		local ptcount = (#p-1)>>1
+		_.c2 = p[2]
+		local ptcount = (#p-2)>>1
 		for i = 1,ptcount do
-			_.pts[i] = {p[i*2],p[1+i*2]}
+			_.pts[i] = {p[1+i*2],p[2+i*2]}
 		end
 	end
 
 	function item.Save(_)
 		local s = {}
 		table.insert(s,_.c)
+		table.insert(s,_.c2)
 		for k,v in pairs(_.pts) do
 			table.insert(s,v[1])
 			table.insert(s,v[2])
@@ -283,8 +309,8 @@ function CreateFill(item)
 	end
 
 	function item.Init(_)
-		local x=_.pts[1][1]
-		local y=_.pts[1][2]
+		local x = _.pts[1][1]
+		local y = _.pts[1][2]
 
 		if not InScreen(x,y) then return end
 
@@ -294,6 +320,20 @@ function CreateFill(item)
 		_.o = pix(x,y)
 		_.q = CreateQueue()
 		_.q:push({x,y})
+	end
+
+	function item.GetColor(_,x,y)
+		if _.c == _.c2 then
+			return _.c
+		else
+			local a,b = {_.pts[1][1],_.pts[1][2]},{_.pts[2][1],_.pts[2][2]}
+			local k = ComputeProjRatio(a,b,{x,y})
+			if Bayer8x8:IsAbove(k,x,y) then
+				return _.c2
+			else
+				return _.c
+			end
+		end
 	end
 
 	function item.Draw(_,fnPix)
@@ -311,14 +351,16 @@ function CreateFill(item)
 
 		while Inside(lx-1,y,o) do
 			if fnPix ~= nil then
-				fnPix(lx-1,y,_.c)
+				local c = _:GetColor(lx-1,y)
+				fnPix(lx-1,y,c)
 			end
 			lx = lx-1
 		end
 
 		while Inside(x,y,o) do
 			if fnPix ~= nil then
-				fnPix(x,y,_.c)
+				local c = _:GetColor(x,y)
+				fnPix(x,y,c)
 			end
 			x = x+1
 		end

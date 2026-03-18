@@ -3,7 +3,7 @@ require "Dither"
 --[[
 function FillPix(x,y,c)
 	local matrixSize = 8
-	local threshold = ditherMatrix8x8[x%matrixSize+1][y%matrixSize+1]
+	local threshold = Bayer8x8[x%matrixSize+1][y%matrixSize+1]
 
 	local h=136
 	local border=20

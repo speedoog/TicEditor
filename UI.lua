@@ -234,6 +234,19 @@ function UI.Draw(_)
 	_:DrawTooltips()
 
 	vbank(1)
+	if key(gKeyCtrl) then
+		if keyp(gKeyRight,20,1) then _:MoveAll(1,0)		end
+		if keyp(gKeyLeft,20,1) 	then _:MoveAll(-1,0)	end
+		if keyp(gKeyUp,20,1) 	then _:MoveAll(0,-1)	end
+		if keyp(gKeyDown,20,1) 	then _:MoveAll(0,1)		end
+		if keyp(gKeyS,20,1) 	then Save(scene) 		end
+	else
+		if keyp(gKeyRight,20,1) then _:SetCurrentItem(_.iCurItem+1) end
+		if keyp(gKeyLeft,20,1) 	then _:SetCurrentItem(_.iCurItem-1) end
+		if keyp(gKeyUp,20,1) 	then _:SetCurrentPoint(_.iCurPt+1) end
+		if keyp(gKeyDown,20,1) 	then _:SetCurrentPoint(_.iCurPt-1) end
+	end
+
 	DrawCrosshair(_.mx,_.my)
 	local item = scene.items[_.iCurItem]
 	if item then
@@ -256,6 +269,11 @@ function UI.Draw(_)
 			end
 
 			DrawCrosshair(pt[1],pt[2])
+
+			if keyp(gKeyDel) then
+				table.remove(item.pts, _.iCurPt)
+				_.iCurPt = min(_.iCurPt,#item.pts)
+			end
 		end
 	end
 	vbank(0)
@@ -273,18 +291,6 @@ end
 
 function UI.DrawEditor(_)
 	vbank(1)
-
-	if key(gKeyCtrl) then
-		if keyp(gKeyRight,20,1) then _:MoveAll(1,0)		end
-		if keyp(gKeyLeft,20,1) 	then _:MoveAll(-1,0)	end
-		if keyp(gKeyUp,20,1) 	then _:MoveAll(0,-1)	end
-		if keyp(gKeyDown,20,1) 	then _:MoveAll(0,1)		end
-	else
-		if keyp(gKeyRight,20,1) then _:SetCurrentItem(_.iCurItem+1) end
-		if keyp(gKeyLeft,20,1) 	then _:SetCurrentItem(_.iCurItem-1) end
-		if keyp(gKeyUp,20,1) 	then _:SetCurrentPoint(_.iCurPt+1) end
-		if keyp(gKeyDown,20,1) 	then _:SetCurrentPoint(_.iCurPt-1) end
-	end
 
 	if _:ButtonIcon(0,gSizeY-_.btnSize,_.btnSize,_.btnSize,gBlack,289,"editor") then
 		_.mode="player"
@@ -341,12 +347,13 @@ function UI.UpdateItemEditor(_)
 			end
 
 			if item then									-- item valid, continue init
-				item.c = _.color1
+				item.c  = _.color1
+				item.c2 = _.color2
 				_.btrace = true
 				AppendItem(scene,item, _.iCurItem+1)
 				table.insert(item.pts, {mx,my})
 
-				if item.maxpt==1 then
+				if item.maxpt==#item.pts then
 					_.btrace = false
 				else
 					table.insert(item.pts, {mx,my})
@@ -364,7 +371,12 @@ function UI.UpdateItemEditor(_)
 				_.btrace=false								-- stop
 			else
 				item.pts[#item.pts]={mx,my}					-- update point
-				table.insert(item.pts, {mx,my})				-- add new one
+
+				if item.maxpt == #item.pts then
+					_.btrace = false
+				else
+					table.insert(item.pts,{mx,my}) 			-- add new one
+				end
 			end
 		end
 	end
@@ -438,17 +450,19 @@ function UI.DrawItems(_)
 	for k, item in pairs(scene.items) do
 		bContinue=true
 		item:Init()
-
 		while bContinue do
 			if iPix >= _.iPixTarget then
-				bComplete=true bContinue=false
+				bComplete=true
+				bContinue=false
 			else
+				iPix=iPix+1
 				local i=item:Draw(function(x,y,c) pix(x,y,c) end)
 				bContinue = i>0
-				iPix=iPix+i
 			end
 		end
-		if bComplete then break end
+		if bComplete then
+			break
+		end
 	end
 end
 
@@ -458,7 +472,10 @@ function UI.Init(_)
 
 	HideCursor()
 
-	scene = Load("spectrals.txt")
+	--scene = Load("Spectrals.txt")
+	--scene = Load("Levex.txt")
+	scene = Load("test.txt")
+	
 	_.iPixTarget = scene.nPix
 	_:SetCurrentItem(#scene.items)	-- seek to last
 end

@@ -55,6 +55,13 @@ function cubicBezier2(t,x0,y0,x1,y1,x2,y2,x3,y3)
 end
 
 -- ---------------------------------------------------------------------
+-- 							Vector2
+-- ---------------------------------------------------------------------
+function V2Sub(v1,v2) return {v1[1]-v2[1],v1[2]-v2[2]} end
+function V2Dot(v1,v2) return v1[1]*v2[1]+v1[2]*v2[2] end
+function V2SqLength(v) return v[1]*v[1]+v[2]*v[2] end
+
+-- ---------------------------------------------------------------------
 -- 							CatmullRom
 -- https://iquilezles.org/articles/minispline/
 -- keys format : spline ={0,x0,y0,1,x1,y1,2,x2,y2,3,x3,y3}
