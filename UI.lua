@@ -472,9 +472,10 @@ function UI.Init(_)
 
 	HideCursor()
 
+	--scene = Load("test.txt")
 	--scene = Load("Spectrals.txt")
 	--scene = Load("Levex.txt")
-	scene = Load("test.txt")
+	scene = Load("Tibet.txt")
 	
 	_.iPixTarget = scene.nPix
 	_:SetCurrentItem(#scene.items)	-- seek to last
