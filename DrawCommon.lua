@@ -62,6 +62,9 @@ function CreatePolyLine(item)
 		for i = 1,ptcount do
 			_.pts[i] = {p[i*2],p[1+i*2]}
 		end
+		if #_.pts==1 then
+			_.pts[2] = _.pts[1]
+		end
 	end
 
 	function item.Save(_)
@@ -326,12 +329,16 @@ function CreateFill(item)
 		if _.c == _.c2 then
 			return _.c
 		else
-			local a,b = {_.pts[1][1],_.pts[1][2]},{_.pts[2][1],_.pts[2][2]}
-			local k = ComputeProjRatio(a,b,{x,y})
-			if Bayer8x8:IsAbove(k,x,y) then
-				return _.c2
-			else
+			if #_.pts<=1 then
 				return _.c
+			else
+				local a,b = {_.pts[1][1],_.pts[1][2]},{_.pts[2][1],_.pts[2][2]}
+				local k = ComputeProjRatio(a,b,{x,y})
+				if Bayer8x8:IsAbove(k,x,y) then
+					return _.c2
+				else
+					return _.c
+				end
 			end
 		end
 	end
