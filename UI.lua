@@ -475,8 +475,8 @@ function UI.Init(_)
 	--scene = Load("test.txt")
 	--scene = Load("Spectrals.txt")
 	--scene = Load("Levex.txt")
-	scene = Load("Dear.txt")
-	--scene = Load("Rando.txt")
+	--scene = Load("Dear.txt")
+	scene = Load("Rando.txt")
 	
 	_.iPixTarget = scene.nPix
 	_:SetCurrentItem(#scene.items)	-- seek to last
